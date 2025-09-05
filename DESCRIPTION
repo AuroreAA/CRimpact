@@ -12,10 +12,21 @@ Authors@R: c(
 Description: PKG_DESC.
 License: GPL (>= 3)
 Imports: 
+    bsicons,
+    bslib,
     config,
+    DT,
+    ggplot2,
     golem,
-    shiny
+    latent2likert,
+    plotly,
+    scales,
+    shiny,
+    shinyWidgets,
+    utils
 Suggests: 
+    knitr,
+    rmarkdown,
     spelling,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
@@ -23,3 +34,6 @@ Encoding: UTF-8
 Language: en-US
 LazyData: true
 RoxygenNote: 7.3.2
+VignetteBuilder: knitr
+URL: https://github.com/AuroreAA/CRimpact
+BugReports: https://github.com/AuroreAA/CRimpact/issues

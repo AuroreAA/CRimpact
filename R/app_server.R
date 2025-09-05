@@ -3,7 +3,67 @@
 #' @param input,output,session Internal parameters for {shiny}.
 #'     DO NOT REMOVE.
 #' @import shiny
+#' @import bslib
+#' @import DT
+#' @rawNamespace import(shiny, except=c(dataTableOutput, renderDataTable))
 #' @noRd
 app_server <- function(input, output, session) {
   # Your application server logic
+
+
+  # Initialisation of reactive values
+  r <- reactiveValues(
+    # Scale X
+    J_X = NULL,
+    K_X = NULL,
+    type_true_distribution_X = NULL,
+    rhoscale_X = NULL,
+    prop_X = NULL,
+    shift_X = NULL,
+    scale_X = NULL,
+    skewness_X = NULL,
+    # Scale Y
+    J_Y = NULL,
+    K_Y = NULL,
+    type_true_distribution_Y = NULL,
+    rhoscale_Y = NULL,
+    prop_Y = NULL,
+    shift_Y = NULL,
+    scale_Y = NULL,
+    skewness_Y = NULL,
+    # Bias
+    rho_XY = NULL,
+    type_cont_distribution_X = NULL,
+    type_cont_distribution_Y = NULL,
+    prop_cont = NULL,
+    straightat_X = 1,
+    straightat_Y = 1,
+    sameXY = 0
+  )
+
+  # Scale
+  mod_sidebar_scale_server("sidebar_scale_X", tab_name = "X", r)
+  mod_sidebar_scale_server("sidebar_scale_Y", tab_name = "Y", r)
+  mod_scale_server("scale_X", tab_name = "X", r)
+  mod_scale_server("scale_Y", tab_name = "Y", r)
+
+
+  # crimpact
+  mod_sidebar_bias_server("sidebar_bias_1", tab_name = "crimpact", r)
+  mod_crimpact_server("crimpact_1", r)
+
+  # Bias
+  mod_sidebar_bias_server("sidebar_bias_2", tab_name = "bias", r)
+  mod_bias_server("bias_1", r)
+
+  # Info
+  mod_sidebar_info_server("sidebar_info_1")
+  mod_info_server("info_1")
+
+  observeEvent(r$sameXY,{
+    if(r$sameXY > 0){
+      nav_select(id = "tabs_scales", selected = "Scale Y", session = session)
+    }
+
+  })
 }

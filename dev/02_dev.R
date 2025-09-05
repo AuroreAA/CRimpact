@@ -20,8 +20,29 @@ attachment::att_amend_desc()
 
 ## Add modules ----
 ## Create a module infrastructure in R/
-golem::add_module(name = "name_of_module1", with_test = TRUE) # Name of the module
-golem::add_module(name = "name_of_module2", with_test = TRUE) # Name of the module
+golem::add_module(name = "scale", with_test = TRUE) # Name of the module
+golem::add_module(name = "sidebar_scale", with_test = TRUE) # Name of the module
+
+golem::add_module(name = "crimpact", with_test = TRUE) # Name of the module
+golem::add_module(name = "bias", with_test = TRUE) # Name of the module
+golem::add_module(name = "sidebar_bias", with_test = TRUE) # Name of the module
+
+golem::add_module(name = "info", with_test = FALSE) # Name of the module
+golem::add_module(name = "sidebar_info", with_test = FALSE) # Name of the module
+
+
+usethis::use_package( "bslib" )
+usethis::use_package("DT")
+usethis::use_package("ggplot2")
+usethis::use_package("shinyWidgets")
+usethis::use_package("bsicons")
+usethis::use_package("plotly")
+usethis::use_package("scales")
+usethis::use_package("latent2likert")
+usethis::use_package("bslib")
+usethis::use_package("utils")
+
+
 
 ## Add helper functions ----
 ## Creates fct_* and utils_*
@@ -73,6 +94,8 @@ usethis::use_github_action_check_standard()
 usethis::use_github_action_check_full()
 # Add action for PR
 usethis::use_github_action_pr_commands()
+
+use_github_action("check-standard")
 
 # Circle CI
 usethis::use_circleci()
