@@ -82,6 +82,11 @@ golem::use_utils_ui(with_test = TRUE)
 golem::use_utils_server(with_test = TRUE)
 
 ## Use git ----
+usethis::use_git_config(
+  scope = "user",
+  user.name = "AuroreAA",
+  user.email = "aurore.archimbaud@live.fr"
+)
 usethis::use_git()
 ## Sets the remote associated with 'name' to 'url'
 usethis::use_git_remote(
