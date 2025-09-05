@@ -1,0 +1,25 @@
+Package: CRimpact
+Title: Careless Responding Impact
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Aurore", "Archimbaud", , "aurore.archimbaud@live.fr", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-6511-9091")),
+    person("Andreas", "Alfons", , "alfons@ese.eur.nl", role = "aut",
+           comment = c(ORCID = "0000-0002-2513-3788")),
+    person("Max", "Welz", , "max.welz@uzh.ch", role = "aut",
+           comment = c(ORCID = "0000-0003-2945-1860"))
+  )
+Description: PKG_DESC.
+License: GPL (>= 3)
+Imports: 
+    config,
+    golem,
+    shiny
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.1
+Suggests: 
+    spelling,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Language: en-US
