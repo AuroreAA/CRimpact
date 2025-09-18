@@ -56,9 +56,9 @@ get_model_distribution <- function(type, K = 5)
 }
 #' Get probability mass distributions for a prespecified contaminating distribution
 #'
-#' @param type Type of model distribution. Must be either \code{"random"}, \code{"straight"}, or \code{"extreme"}.
+#' @param type Type of model distribution. Must be either \code{"random"}, \code{"straightlining"}, or \code{"extreme"}.
 #' @param K Number of response categories. Must be either 5, 7, or 9.
-#' @param straightat Index of answer category which is straightline (default is 1). Only applicable when \code{type = "straight"}
+#' @param straightat Index of answer category which is straightline (default is 1). Only applicable when \code{type = "straightlining"}
 #'
 #' @author Max Welz
 #' @return PMF (numeric vector)
@@ -71,7 +71,7 @@ get_contam_distribution <- function(type, K = 5, straightat = 1)
   if(identical(type, "random"))
   {
     pi <- rep(1.0 / K, K)
-  } else if(identical(type, "straight"))
+  } else if(identical(type, "straightlining"))
   {
     stopifnot(1 <= straightat && straightat <= K)
     pi <- rep(0.0, K)
@@ -81,7 +81,7 @@ get_contam_distribution <- function(type, K = 5, straightat = 1)
     pi <- c(0.5, rep(0.0, K-2L), 0.5)
   } else
   {
-    stop('Type of contaminating distribution must be an element in c("random", "straight", "extreme")')
+    stop('Type of contaminating distribution must be an element in c("random", "straightlining", "extreme")')
   }
 
   return(pi)
@@ -451,7 +451,7 @@ maxbias <- function(eps, JX, JY = JX,
 #' Visualize bias curves at specific contaminating distribution
 #'
 #' @param FX Either a probability mass function (PMF) of a rating-scale variable \code{X} or a character in \code{c("centered", "agree", "polarized")}. The \eqn{k}-th element of a PMF corresponds to the probability that the \eqn{k}-th response category is chosen, for all elements \eqn{k = 1,2,\dots} of the PMF.
-#' @param HX Character denoting the type of contaminating distribution for the \code{X}-scale. Must be in  \code{c("random", "straight", "extreme")}
+#' @param HX Character denoting the type of contaminating distribution for the \code{X}-scale. Must be in  \code{c("random", "straightlining", "extreme")}
 #' @param rhoXY Correlation between scores \eqn{X = \sum_{j=1}^J X_j / J_X} and \eqn{Y = \sum_{j=1}^J Y_j / J_Y} under model distribution \code{F}
 #' @param rhoscaleX Within-scale correlation between items in the X-scale comprising items that are each distributed according to model distribution \code{F}
 #' @param JX Size of the X-scale
@@ -509,13 +509,13 @@ bias_plot <- function (FX, HX, rhoXY, rhoscaleX, JX, FY = FX, HY = HX, rhoscaleY
     piHX <- get_contam_distribution(type = HX, K = kx, straightat = straightatX)
   }
   else {
-    stop("HX must be a character vector equaling an element in c(\"random\", \"straight\", \"extreme\")")
+    stop("HX must be a character vector equaling an element in c(\"random\", \"straightlining\", \"extreme\")")
   }
   if (is.character(HY)) {
     piHY <- get_contam_distribution(type = HY, K = ky, straightat = straightatY)
   }
   else {
-    stop("HY must be a character vector equaling an element in c(\"random\", \"straight\", \"extreme\")")
+    stop("HY must be a character vector equaling an element in c(\"random\", \"straightlining\", \"extreme\")")
   }
   phiXY <- 0
   phiscale <- phiXY

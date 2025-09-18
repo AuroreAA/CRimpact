@@ -20,7 +20,7 @@ mod_scale_ui <- function(id) {
         card(
           full_screen = FALSE,
           max_height = 200,
-          card_header("Marginals propabilities"),
+          card_header("Marginal probabilities"),
           DT::DTOutput(ns("df_prop"))
         ),
         value_box(

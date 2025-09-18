@@ -11,19 +11,19 @@
 mod_sidebar_bias_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    numericInput(ns("rho_XY"), "Between scale correlation", -0.2, min = -1, max = 1, step = 0.1),
+    numericInput(ns("rho_XY"), "Between-scale correlation", -0.2, min = -1, max = 1, step = 0.1),
 
     div(id = ns("type_X"),
         HTML("<b>Contamination of X and Y</b>"),
         selectInput(
           ns("type_cont_distribution_X"),
           label = "Contaminated distribution",
-          choices = c("random", "straight", "extreme"),
-          selected = "random"
+          choices = c("random", "straightlining", "extreme"),
+          selected = "straightlining"
         )
     ),
     div(id = ns("straight_X"),
-        numericInput(ns("straightat_X"), "Straight at", 1, min = 1, max = 10, step = 1)
+        numericInput(ns("straightat_X"), "straightlining at", 1, min = 1, max = 10, step = 1)
     ),
 
     # div(id = ns("type_Y"),
@@ -49,6 +49,20 @@ mod_sidebar_bias_server <- function(id, tab_name, r){
     ns <- session$ns
     observeEvent(input$rho_XY,{
       req(input$rho_XY)
+
+
+      if(abs(input$rho_XY) > 1){
+        shinyWidgets::sendSweetAlert(
+          session = session,
+          title = "Warning",
+          text = "The between-scale correlation should be between -1 and 1.",
+          type = "warning",
+          html = FALSE
+        )
+      }
+      validate(need(abs(input$rho_XY) <= 1,
+                    "The between-scale correlation should be between -1 and 1."))
+
       r$rho_XY <- input$rho_XY
     })
 
@@ -61,7 +75,7 @@ mod_sidebar_bias_server <- function(id, tab_name, r){
     observeEvent(input$type_cont_distribution_X,{
       req(input$type_cont_distribution_X)
 
-      if(input$type_cont_distribution_X != "straight"){
+      if(input$type_cont_distribution_X != "straightlining"){
         golem::invoke_js("hideid",ns("straight_X"))
       }else{
         golem::invoke_js("showid",ns("straight_X"))

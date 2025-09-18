@@ -25,7 +25,7 @@ bias_plot(
 \arguments{
 \item{FX}{Either a probability mass function (PMF) of a rating-scale variable \code{X} or a character in \code{c("centered", "agree", "polarized")}. The \eqn{k}-th element of a PMF corresponds to the probability that the \eqn{k}-th response category is chosen, for all elements \eqn{k = 1,2,\dots} of the PMF.}
 
-\item{HX}{Character denoting the type of contaminating distribution for the \code{X}-scale. Must be in  \code{c("random", "straight", "extreme")}}
+\item{HX}{Character denoting the type of contaminating distribution for the \code{X}-scale. Must be in  \code{c("random", "straightlining", "extreme")}}
 
 \item{rhoXY}{Correlation between scores \eqn{X = \sum_{j=1}^J X_j / J_X} and \eqn{Y = \sum_{j=1}^J Y_j / J_Y} under model distribution \code{F}}
 

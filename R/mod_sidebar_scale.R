@@ -15,17 +15,22 @@ mod_sidebar_scale_ui <- function(id) {
     golem::activate_js(), # already loaded in your golem by `bundle_resources()`
     card(
       full_screen = FALSE,
-      numericInput(ns("J"), "Number of items per scale", 10, min = 1, max = 50, step = 1),
-      numericInput(ns("K"), "Number of anwser categories", 9, min = 3, max = 50, step = 2),
+      numericInput(ns("J"), "Number of items", 10, min = 1, max = 50, step = 1),
+
       selectInput(
         ns("type_true_distribution"),
         label = "True distribution",
         choices = c("centered","agree","polarized", "customized"),
         selected = "centered"
       ),
+      div(id = ns("fixed"),
+          radioButtons(ns("K_fixed"), "Number of anwser categories",
+                       choices = c(5,7,9), selected = 7)
+      ),
       div(id = ns("custom"),
-          numericInput(ns("shift"), "Shift value", 0),
-          numericInput(ns("scale"), "Dispersion value", 1, min = 0, max = 1, step = 0.1),
+          numericInput(ns("K"), "Number of anwser categories", 5, min = 3, max = 50, step = 1),
+          numericInput(ns("shift"), "Shift value", 0, step = 0.1),
+          numericInput(ns("scale"), "Dispersion value", 1, min = 0, step = 0.1),
           numericInput(ns("skewness"), "Assymetry value", 0, min = -0.95, max = 0.95, step = 0.05),
           # p(
           #   HTML(
@@ -61,7 +66,7 @@ mod_sidebar_scale_ui <- function(id) {
 
       ),
 
-      numericInput(ns("rhoscale"), "Within scale correlation", 0.8, min = -1, max = 1, step = 0.1),
+      numericInput(ns("rhoscale"), "Within-scale correlation", 0.8, min = -1, max = 1, step = 0.1),
       div(id = ns("sameX"),
           div(
             class = "d-flex justify-content-center",
@@ -82,6 +87,18 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
     # Number of items
     observeEvent(input$J,{
       req(input$J)
+
+      if(input$J<1){
+        shinyWidgets::sendSweetAlert(
+          session = session,
+          title = "Warning",
+          text = "The number of items should be at least 1.",
+          type = "warning",
+          html = FALSE
+        )
+      }
+      validate(need(input$J >= 1,
+                    "The number of item should be at least 1." ))
       if(tab_name == "X"){
         r$J_X <- input$J
       }else{
@@ -92,10 +109,23 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
     # Number of response categories
     observeEvent(input$K,{
       req(input$K)
+      validate(need(input$type_true_distribution == "customized",
+                    "The distribution should be 'customized'."))
       if(tab_name == "X"){
         r$K_X <- input$K
       }else{
         r$K_Y <- input$K
+      }
+    })
+
+    observeEvent(input$K_fixed,{
+      validate(need(input$type_true_distribution != "customized",
+                    "The distribution should not be 'customized'."))
+      req(input$K_fixed)
+      if(tab_name == "X"){
+        r$K_X <- input$K_fixed
+      }else{
+        r$K_Y <- input$K_fixed
       }
     })
 
@@ -105,8 +135,10 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
 
       if(input$type_true_distribution != "customized"){
         golem::invoke_js("hideid",ns("custom"))
+        golem::invoke_js("showid",ns("fixed"))
       }else{
         golem::invoke_js("showid",ns("custom"))
+        golem::invoke_js("hideid",ns("fixed"))
       }
 
 
@@ -120,6 +152,20 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
     # Within-scale correlation between items in the X-scale
     observeEvent(input$rhoscale,{
       req(input$rhoscale)
+
+      if(abs(input$rhoscale) > 1){
+        shinyWidgets::sendSweetAlert(
+          session = session,
+          title = "Warning",
+          text = "The within-scale correlation should be between -1 and 1.",
+          type = "warning",
+          html = FALSE
+        )
+      }
+      validate(need(abs(input$rhoscale) <= 1,
+                    "The within-scale correlation should be between -1 and 1."))
+
+
       if(tab_name == "X"){
         r$rhoscale_X <- input$rhoscale
       }else{
@@ -141,6 +187,19 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
     # sd parameter
     observeEvent(input$scale,{
       req(input$scale)
+      if(input$scale <= 0){
+        shinyWidgets::sendSweetAlert(
+          session = session,
+          title = "Warning",
+          text = "The dispersion should be strictly positive.",
+          type = "warning",
+          html = FALSE
+        )
+      }
+      validate(need(input$scale > 0,
+                    "The dispersion should be strictly positive." ))
+
+
       if(tab_name == "X"){
         r$scale_X <- input$scale
       }else{
@@ -189,8 +248,14 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
     })
     observeEvent(r$K_Y,{
       req(r$K_Y)
-      if(tab_name == "Y")
-        updateNumericInput(session, "K", value = r$K_Y)
+      if(tab_name == "Y"){
+        if(r$type_true_distribution_Y == "customized"){
+          updateNumericInput(session, "K", value = r$K_Y)
+        }else{
+          updateRadioButtons(session, "K_fixed", selected = r$K_Y)
+        }
+      }
+
     })
     observeEvent(r$type_true_distribution_Y,{
       req(r$type_true_distribution_Y)

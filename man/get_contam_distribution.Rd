@@ -7,11 +7,11 @@
 get_contam_distribution(type, K = 5, straightat = 1)
 }
 \arguments{
-\item{type}{Type of model distribution. Must be either \code{"random"}, \code{"straight"}, or \code{"extreme"}.}
+\item{type}{Type of model distribution. Must be either \code{"random"}, \code{"straightlining"}, or \code{"extreme"}.}
 
 \item{K}{Number of response categories. Must be either 5, 7, or 9.}
 
-\item{straightat}{Index of answer category which is straightline (default is 1). Only applicable when \code{type = "straight"}}
+\item{straightat}{Index of answer category which is straightline (default is 1). Only applicable when \code{type = "straightlining"}}
 }
 \value{
 PMF (numeric vector)

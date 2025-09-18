@@ -13,7 +13,7 @@ app_ui <- function(request) {
     page_navbar(
       title = "Careless Responding Impact",
       window_title = "CRimpact",
-      navbar_options = navbar_options(collapsible = TRUE, underline = FALSE),
+      navbar_options = navbar_options(collapsible = FALSE, underline = FALSE),
       theme = bs_theme(bootswatch = "minty"), # morph or spacelab
 
 
