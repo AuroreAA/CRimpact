@@ -27,7 +27,8 @@ mod_bias_ui <- function(id) {
           full_screen = FALSE,
           max_height = 200,
           card_header("Distribution"),
-          plotOutput(ns("plot_prop"))
+          # plotOutput(ns("plot_prop"))
+          plotlyOutput(ns("plot_prop"))
         )
       ),
 
@@ -141,16 +142,20 @@ mod_bias_server <- function(id, r){
 
     # Distribution plot output -------
 
-    output$plot_prop <- renderPlot({
+    # output$plot_prop <- renderPlot({
+    output$plot_prop <- renderPlotly({
       req(r_mod$dt)
 
       df <- data.frame(K = colnames(r_mod$dt), y = t(r_mod$dt))
 
-      ggplot(data = df, aes(x = K, y = y)) +
+      p <- ggplot(data = df, aes(x = K, y = y)) +
         geom_bar(stat = "identity") +
+        ylim(0, 1) +
         xlab("Response option") +
         ylab("Probability mass") +
         theme_minimal()
+
+      ggplotly(p, tooltip = "text")
 
 
     })

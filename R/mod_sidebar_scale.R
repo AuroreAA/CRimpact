@@ -24,8 +24,11 @@ mod_sidebar_scale_ui <- function(id) {
         selected = "centered"
       ),
       div(id = ns("fixed"),
-          radioButtons(ns("K_fixed"), "Number of anwser categories",
-                       choices = c(5,7,9), selected = 7)
+          selectInput(
+            ns("K_fixed"),
+            label = "Number of anwser categories",
+            choices = c(5,7,9),
+            selected = 7)
       ),
       div(id = ns("custom"),
           numericInput(ns("K"), "Number of anwser categories", 5, min = 3, max = 50, step = 1),
@@ -107,7 +110,9 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
     })
 
     # Number of response categories
-    observeEvent(input$K,{
+    observeEvent({
+      input$K
+    },{
       req(input$K)
       validate(need(input$type_true_distribution == "customized",
                     "The distribution should be 'customized'."))
@@ -118,7 +123,10 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
       }
     })
 
-    observeEvent(input$K_fixed,{
+
+    observeEvent({
+      input$K_fixed
+    },{
       validate(need(input$type_true_distribution != "customized",
                     "The distribution should not be 'customized'."))
       req(input$K_fixed)
@@ -129,6 +137,7 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
       }
     })
 
+
     # Type of distribution
     observeEvent(input$type_true_distribution,{
       req(input$type_true_distribution)
@@ -136,9 +145,19 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
       if(input$type_true_distribution != "customized"){
         golem::invoke_js("hideid",ns("custom"))
         golem::invoke_js("showid",ns("fixed"))
+        if(tab_name == "X"){
+          r$K_X <- input$K_fixed
+        }else{
+          r$K_Y <- input$K_fixed
+        }
       }else{
         golem::invoke_js("showid",ns("custom"))
         golem::invoke_js("hideid",ns("fixed"))
+        if(tab_name == "X"){
+          r$K_X <- input$K
+        }else{
+          r$K_Y <- input$K
+        }
       }
 
 
@@ -147,6 +166,9 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
       }else{
         r$type_true_distribution_Y <- input$type_true_distribution
       }
+
+
+
     })
 
     # Within-scale correlation between items in the X-scale
@@ -252,7 +274,7 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
         if(r$type_true_distribution_Y == "customized"){
           updateNumericInput(session, "K", value = r$K_Y)
         }else{
-          updateRadioButtons(session, "K_fixed", selected = r$K_Y)
+          updateSelectInput(session, "K_fixed", selected = r$K_Y)
         }
       }
 
@@ -260,8 +282,8 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
     observeEvent(r$type_true_distribution_Y,{
       req(r$type_true_distribution_Y)
       if(tab_name == "Y")
-        updateNumericInput(session, "type_true_distribution",
-                           value = r$type_true_distribution_Y)
+        updateSelectInput(session, "type_true_distribution",
+                          selected = r$type_true_distribution_Y)
     })
 
     observeEvent(r$shift_Y,{
