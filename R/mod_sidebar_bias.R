@@ -44,7 +44,7 @@ mod_sidebar_bias_ui <- function(id) {
 #' sidebar_bias Server Functions
 #'
 #' @noRd
-mod_sidebar_bias_server <- function(id, tab_name, r){
+mod_sidebar_bias_server <- function(id, tab_name = "crimpact", r){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
     observeEvent(input$rho_XY,{

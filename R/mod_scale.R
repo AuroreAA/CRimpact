@@ -54,10 +54,10 @@ mod_scale_server <- function(id, tab_name, r){
       r$scale_X
       r$skewness_X
     },
-    r$prop_X <- get_custom_distribution(type = r$type_true_distribution_X,
-                                        K = r$K_X, mean = r$shift_X,
-                                        sd = r$scale_X,
-                                        skew = r$skewness_X, session = session )
+      r$prop_X <- get_custom_distribution(type = r$type_true_distribution_X,
+                                          K = r$K_X, mean = r$shift_X,
+                                          sd = r$scale_X,
+                                          skew = r$skewness_X, session = session)
     )
 
     observeEvent({

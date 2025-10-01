@@ -60,7 +60,7 @@ A \code{ggplot} object
 Visualize bias curves at specific contaminating distribution
 }
 \seealso{
-[bias()],  [get_contam_distribution()]#'
+[bias()],  [get_contam_distribution()]
 }
 \author{
 Aurore Archimbaud and Max Welz

@@ -69,7 +69,7 @@ mod_sidebar_scale_ui <- function(id) {
 
       ),
 
-      numericInput(ns("rhoscale"), "Within-scale correlation", 0.8, min = -1, max = 1, step = 0.1),
+      numericInput(ns("rhoscale"), "Within-scale correlation", 0.8, min = 0, max = 1, step = 0.1),
       div(id = ns("sameX"),
           div(
             class = "d-flex justify-content-center",
@@ -175,11 +175,11 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
     observeEvent(input$rhoscale,{
       req(input$rhoscale)
 
-      if(abs(input$rhoscale) > 1){
+      if(input$rhoscale > 1 | input$rhoscale <0){
         shinyWidgets::sendSweetAlert(
           session = session,
           title = "Warning",
-          text = "The within-scale correlation should be between -1 and 1.",
+          text = "The within-scale correlation should be between 0 and 1.",
           type = "warning",
           html = FALSE
         )
