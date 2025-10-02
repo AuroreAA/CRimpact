@@ -41,6 +41,10 @@ app_server <- function(input, output, session) {
     sameXY = 0
   )
 
+  # Distribution
+  mod_sidebar_distri_server("sidebar_distri_1", r)
+  mod_distri_server("distri_1", r)
+
   # Scale
   mod_sidebar_scale_server("sidebar_scale_X", tab_name = "X", r)
   mod_sidebar_scale_server("sidebar_scale_Y", tab_name = "Y", r)

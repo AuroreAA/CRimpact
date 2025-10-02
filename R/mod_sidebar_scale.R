@@ -14,32 +14,19 @@ mod_sidebar_scale_ui <- function(id) {
   tagList(
     golem::activate_js(), # already loaded in your golem by `bundle_resources()`
     card(
-      full_screen = FALSE,
+      full_screen = TRUE,
       numericInput(ns("J"), "Number of items", 10, min = 1, max = 50, step = 1),
 
       selectInput(
         ns("type_true_distribution"),
         label = "True distribution",
-        choices = c("centered","agree","polarized", "customized"),
+        choices = c("centered","agreeing","polarized", "customized"),
         selected = "centered"
       ),
-      div(id = ns("fixed"),
-          selectInput(
-            ns("K_fixed"),
-            label = "Number of anwser categories",
-            choices = c(5,7,9),
-            selected = 7)
-      ),
       div(id = ns("custom"),
-          numericInput(ns("K"), "Number of anwser categories", 5, min = 3, max = 50, step = 1),
           numericInput(ns("shift"), "Shift value", 0, step = 0.1),
           numericInput(ns("scale"), "Dispersion value", 1, min = 0, step = 0.1),
           numericInput(ns("skewness"), "Assymetry value", 0, min = -0.95, max = 0.95, step = 0.05),
-          # p(
-          #   HTML(
-          #     '<small><em>For details on the function parameters, please refer to the <a href="https://cran.r-project.org/web/packages/latent2likert/refman/latent2likert.html#simulate_likert" target="_blank"><code>simulate_likert()</code> </a> and <a href="https://cran.r-project.org/web/packages/latent2likert/refman/latent2likert.html#rlikert" target="_blank"> <code>rlikert()</code></a> functions from <a href="https://cran.r-project.org/web/packages/latent2likert/" target="_blank"><code>latent2likert</code> package. </em></small>'
-          #   )
-          # )
           p(
             tags$small(
               tags$em(
@@ -109,34 +96,6 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
       }
     })
 
-    # Number of response categories
-    observeEvent({
-      input$K
-    },{
-      req(input$K)
-      validate(need(input$type_true_distribution == "customized",
-                    "The distribution should be 'customized'."))
-      if(tab_name == "X"){
-        r$K_X <- input$K
-      }else{
-        r$K_Y <- input$K
-      }
-    })
-
-
-    observeEvent({
-      input$K_fixed
-    },{
-      validate(need(input$type_true_distribution != "customized",
-                    "The distribution should not be 'customized'."))
-      req(input$K_fixed)
-      if(tab_name == "X"){
-        r$K_X <- input$K_fixed
-      }else{
-        r$K_Y <- input$K_fixed
-      }
-    })
-
 
     # Type of distribution
     observeEvent(input$type_true_distribution,{
@@ -144,22 +103,9 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
 
       if(input$type_true_distribution != "customized"){
         golem::invoke_js("hideid",ns("custom"))
-        golem::invoke_js("showid",ns("fixed"))
-        if(tab_name == "X"){
-          r$K_X <- input$K_fixed
-        }else{
-          r$K_Y <- input$K_fixed
-        }
       }else{
         golem::invoke_js("showid",ns("custom"))
-        golem::invoke_js("hideid",ns("fixed"))
-        if(tab_name == "X"){
-          r$K_X <- input$K
-        }else{
-          r$K_Y <- input$K
-        }
       }
-
 
       if(tab_name == "X"){
         r$type_true_distribution_X <- input$type_true_distribution
@@ -167,9 +113,28 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
         r$type_true_distribution_Y <- input$type_true_distribution
       }
 
-
-
     })
+
+    observeEvent(r$K_X,{
+      req(r$K_X)
+
+      if(!(r$K_X %in% c(5,7,9))){
+        updateSelectInput(session, "type_true_distribution",
+                          selected = "customized", choices = "customized")
+      }else{
+        if (tab_name == "X"){
+          updateSelectInput(session, "type_true_distribution",
+                            selected = r$type_true_distribution_X,
+                              choices = c("centered","agreeing","polarized", "customized"))
+        }else{
+          updateSelectInput(session, "type_true_distribution",
+                            selected = r$type_true_distribution_Y,
+                            choices = c("centered","agreeing","polarized", "customized"))
+        }
+
+      }
+    })
+
 
     # Within-scale correlation between items in the X-scale
     observeEvent(input$rhoscale,{
@@ -244,7 +209,6 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
     # To update Y scale if the same as X -----
     observeEvent(input$sameXY,{
       r$J_Y <- r$J_X
-      r$K_Y <- r$K_X
       r$type_true_distribution_Y <- r$type_true_distribution_X
       r$rhoscale_Y <- r$rhoscale_X
       r$shift_Y <- r$shift_X
@@ -268,17 +232,7 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
       if(tab_name == "Y")
         updateNumericInput(session, "J", value = r$J_Y)
     })
-    observeEvent(r$K_Y,{
-      req(r$K_Y)
-      if(tab_name == "Y"){
-        if(r$type_true_distribution_Y == "customized"){
-          updateNumericInput(session, "K", value = r$K_Y)
-        }else{
-          updateSelectInput(session, "K_fixed", selected = r$K_Y)
-        }
-      }
 
-    })
     observeEvent(r$type_true_distribution_Y,{
       req(r$type_true_distribution_Y)
       if(tab_name == "Y")

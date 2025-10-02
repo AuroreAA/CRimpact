@@ -19,7 +19,7 @@ maxbias_plot(
 )
 }
 \arguments{
-\item{FX}{Either a probability mass function (PMF) of a rating-scale variable \code{X} or a character in \code{c("centered", "agree", "polarized")}. The \eqn{k}-th element of a PMF corresponds to the probability that the \eqn{k}-th response category is chosen, for all elements \eqn{k = 1,2,\dots} of the PMF.}
+\item{FX}{Either a probability mass function (PMF) of a rating-scale variable \code{X} or a character in \code{c("centered", "agreed", "polarized")}. The \eqn{k}-th element of a PMF corresponds to the probability that the \eqn{k}-th response category is chosen, for all elements \eqn{k = 1,2,\dots} of the PMF.}
 
 \item{rhoXY}{Correlation between sum-scores \eqn{X = \sum_{j=1}^J X_j / J_X} and \eqn{Y = \sum_{j=1}^J Y_j / J_Y}}
 

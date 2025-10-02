@@ -17,16 +17,18 @@ mod_scale_ui <- function(id) {
 
       layout_columns(
         col_widths = c(9, 3),
+
         card(
           full_screen = FALSE,
-          max_height = 200,
           card_header("Marginal probabilities"),
+          max_height = 200,
           DT::DTOutput(ns("df_prop"))
         ),
         value_box(
           title = "Cronbach's alpha",
           value =  textOutput(ns("cronbach")),
-          showcase = bsicons::bs_icon("align-bottom")
+          showcase = bsicons::bs_icon("align-bottom"),
+          max_height = 200
         )
       ),
       card(
@@ -54,10 +56,12 @@ mod_scale_server <- function(id, tab_name, r){
       r$scale_X
       r$skewness_X
     },
+    {
       r$prop_X <- get_custom_distribution(type = r$type_true_distribution_X,
                                           K = r$K_X, mean = r$shift_X,
                                           sd = r$scale_X,
                                           skew = r$skewness_X, session = session)
+    }
     )
 
     observeEvent({
@@ -67,10 +71,12 @@ mod_scale_server <- function(id, tab_name, r){
       r$scale_Y
       r$skewness_Y
     },
-    r$prop_Y <- get_custom_distribution(type = r$type_true_distribution_Y,
-                                        K = r$K_Y, mean = r$shift_Y,
-                                        sd = r$scale_Y,
-                                        skew = r$skewness_Y, session = session )
+    {
+      r$prop_Y <- get_custom_distribution(type = r$type_true_distribution_Y,
+                                          K = r$K_Y, mean = r$shift_Y,
+                                          sd = r$scale_Y,
+                                          skew = r$skewness_Y, session = session )
+    }
     )
 
 

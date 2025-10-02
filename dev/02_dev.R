@@ -20,6 +20,9 @@ attachment::att_amend_desc()
 
 ## Add modules ----
 ## Create a module infrastructure in R/
+golem::add_module(name = "distri", with_test = TRUE) # Name of the module
+golem::add_module(name = "sidebar_distri", with_test = TRUE) # Name of the module
+
 golem::add_module(name = "scale", with_test = TRUE) # Name of the module
 golem::add_module(name = "sidebar_scale", with_test = TRUE) # Name of the module
 

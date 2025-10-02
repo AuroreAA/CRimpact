@@ -24,20 +24,7 @@ mod_sidebar_bias_ui <- function(id) {
     ),
     div(id = ns("straight_X"),
         numericInput(ns("straightat_X"), "straightlining at", 1, min = 1, max = 10, step = 1)
-    ),
-
-    # div(id = ns("type_Y"),
-    #     HTML("<b>Contamination of Y</b>"),
-    #     selectInput(
-    #       ns("type_cont_distribution_Y"),
-    #       label = "Contaminated distribution",
-    #       choices = c("random", "straight"),
-    #       selected = "random"
-    #     )
-    # ),
-    # div(id = ns("straight_Y"),
-    #     numericInput(ns("straightat_Y"), "Straight at", 1, min = 1, max = 10, step = 1)
-    # )
+    )
   )
 }
 
@@ -85,18 +72,6 @@ mod_sidebar_bias_server <- function(id, tab_name = "crimpact", r){
 
     })
 
-    # observeEvent(input$type_cont_distribution_Y,{
-    #   req(input$type_cont_distribution_Y)
-    #
-    #   if(input$type_cont_distribution_Y == "random"){
-    #     golem::invoke_js("hideid",ns("straight_Y"))
-    #   }else{
-    #     golem::invoke_js("showid",ns("straight_Y"))
-    #   }
-    #
-    #   r$type_cont_distribution_Y <- input$type_cont_distribution_Y
-    #
-    # })
     observeEvent( r$type_cont_distribution_X ,{
       req(r$type_cont_distribution_X)
       r$type_cont_distribution_Y <- r$type_cont_distribution_X
@@ -106,12 +81,6 @@ mod_sidebar_bias_server <- function(id, tab_name = "crimpact", r){
       req(input$straightat_X)
       r$straightat_X <- input$straightat_X
     })
-
-
-    # observeEvent(input$straightat_Y,{
-    #   req(input$straightat_Y)
-    #   r$straightat_Y <- input$straightat_Y
-    # })
 
     observeEvent(r$straightat_X,{
       req( r$straightat_X )
@@ -133,13 +102,10 @@ mod_sidebar_bias_server <- function(id, tab_name = "crimpact", r){
 
     if (tab_name %in% c("crimpact")){
       golem::invoke_js("hideid",ns("straight_X"))
-      # golem::invoke_js("hideid",ns("straight_Y"))
       golem::invoke_js("hideid",ns("type_X"))
-      # golem::invoke_js("hideid",ns("type_Y"))
     }
     if (tab_name %in% c("bias")){
       golem::invoke_js("showid",ns("straight_X"))
-      # golem::invoke_js("showid",ns("straight_Y"))
     }
 
   })

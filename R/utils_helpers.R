@@ -1,6 +1,6 @@
 #' Get probability mass distributions for a prespecified model distribution
 #'
-#' @param type Type of model distribution. Must be either \code{"centered"}, \code{"agree"}, or \code{"polarized"}.
+#' @param type Type of model distribution. Must be either \code{"centered"}, \code{"agreed"}, or \code{"polarized"}.
 #' @param K Number of response categories. Must be either 5, 7, or 9.
 #'
 #' @return PMF (numeric vector)
@@ -25,7 +25,7 @@ get_model_distribution <- function(type, K = 5)
       pi <- c(0.025, 0.05, 0.15, 0.175, 0.2, 0.175, 0.15, 0.05, 0.025)
     } # IF centered
 
-  } else if(identical(type, "agree"))
+  } else if(identical(type, "agreed"))
   {
     if(identical(K, 5L))
     {
@@ -91,7 +91,7 @@ get_contam_distribution <- function(type, K = 5, straightat = 1)
 #' Get probability mass distributions for a prespecified model distribution
 #'
 #' @param type Type of model distribution. Must be either \code{"centered"},
-#' \code{"agree"}, \code{"polarized"} or \code{"customized"}.
+#' \code{"agreed"}, \code{"polarized"} or \code{"customized"}.
 #' @param K Number of response categories. Must be either 5, 7, or 9 if `type`
 #' is different than `"customized"`.
 #' @param mean  Mean parameter of the latent variable,
@@ -104,7 +104,7 @@ get_contam_distribution <- function(type, K = 5, straightat = 1)
 #' @param session Internal shiny session.
 #'
 #' @details The following types of model distribution: \code{"centered"},
-#' \code{"agree"} and \code{"polarized"} are generated based on the same
+#' \code{"agreed"} and \code{"polarized"} are generated based on the same
 #' probabilities as in [get_model_distribution()].
 #' The \code{"customized"} type is generated through
 #' [latent2likert::simulate_likert()].
@@ -127,7 +127,7 @@ get_custom_distribution <- function(type, K = 5, mean = 0, sd = 1,
     shinyWidgets::sendSweetAlert(
       session = session,
       title = "Warning",
-      text = "The number of answer categories should be 5, 7 or 9.",
+      text = "The number of answer categories for not customized distributions should be 5, 7 or 9.",
       type = "warning",
       html = FALSE
     )
@@ -161,7 +161,7 @@ get_custom_distribution <- function(type, K = 5, mean = 0, sd = 1,
               0.05, 0.025)
     }
   }
-  else if (identical(type, "agree")) {
+  else if (identical(type, "agreed")) {
 
     if (identical(K, 5L)) {
       pi <- c(0.1, 0.15, 0.2, 0.25, 0.3)
@@ -450,7 +450,7 @@ maxbias <- function(eps, JX, JY = JX,
 
 #' Visualize bias curves at specific contaminating distribution
 #'
-#' @param FX Either a probability mass function (PMF) of a rating-scale variable \code{X} or a character in \code{c("centered", "agree", "polarized")}. The \eqn{k}-th element of a PMF corresponds to the probability that the \eqn{k}-th response category is chosen, for all elements \eqn{k = 1,2,\dots} of the PMF.
+#' @param FX Either a probability mass function (PMF) of a rating-scale variable \code{X} or a character in \code{c("centered", "agreed", "polarized")}. The \eqn{k}-th element of a PMF corresponds to the probability that the \eqn{k}-th response category is chosen, for all elements \eqn{k = 1,2,\dots} of the PMF.
 #' @param HX Character denoting the type of contaminating distribution for the \code{X}-scale. Must be in  \code{c("random", "straightlining", "extreme")}
 #' @param rhoXY Correlation between scores \eqn{X = \sum_{j=1}^J X_j / J_X} and \eqn{Y = \sum_{j=1}^J Y_j / J_Y} under model distribution \code{F}
 #' @param rhoscaleX Within-scale correlation between items in the X-scale comprising items that are each distributed according to model distribution \code{F}
@@ -541,7 +541,7 @@ bias_plot <- function (FX, HX, rhoXY, rhoscaleX, JX, FY = FX, HY = HX, rhoscaleY
 
 #' Visualize maximum bias curves
 #'
-#' @param FX Either a probability mass function (PMF) of a rating-scale variable \code{X} or a character in \code{c("centered", "agree", "polarized")}. The \eqn{k}-th element of a PMF corresponds to the probability that the \eqn{k}-th response category is chosen, for all elements \eqn{k = 1,2,\dots} of the PMF.
+#' @param FX Either a probability mass function (PMF) of a rating-scale variable \code{X} or a character in \code{c("centered", "agreed", "polarized")}. The \eqn{k}-th element of a PMF corresponds to the probability that the \eqn{k}-th response category is chosen, for all elements \eqn{k = 1,2,\dots} of the PMF.
 #' @param rhoXY Correlation between sum-scores \eqn{X = \sum_{j=1}^J X_j / J_X} and \eqn{Y = \sum_{j=1}^J Y_j / J_Y}
 #' @param rhoscaleX Within-scale correlation between items in the X-scale comprising items that are each distributed according to model distribution \code{F}
 #' @param JX Size of the X-scale
