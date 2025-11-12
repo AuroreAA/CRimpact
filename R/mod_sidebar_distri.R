@@ -10,8 +10,13 @@
 mod_sidebar_distri_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    numericInput(ns("K"), label = "Number of answer categories", 5, min = 3, max = 50, step = 1)
-
+    card(
+      full_screen = FALSE,
+      card_header("Scales X & Y"),
+      max_height = 175,
+      numericInput(ns("K"), label = "Number of answer categories", 5, min = 3,
+                   max = 50, step = 1)
+    )
   )
 }
 

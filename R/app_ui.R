@@ -29,48 +29,43 @@ app_ui <- function(request) {
 
                 ## Number of categories ----
 
-
-                fluidRow(
-
-                  column(
-                    width = 6,
-                    offset = 4,
-
-                    mod_sidebar_distri_ui("sidebar_distri_1")
-                  )
-                ),
+                layout_columns(
+                  col_widths = c(2,10),
+                  mod_sidebar_distri_ui("sidebar_distri_1"),
 
 
-                navset_tab(
-                  id = "tabs_scales",
-                  ## scale X ----
 
-                  nav_panel("Scale X",
-                            layout_columns(
-                              col_widths = c(3, 9),
-                              mod_sidebar_scale_ui("sidebar_scale_X"),
-                              mod_scale_ui("scale_X")
-                            ),
+                  navset_tab(
+                    id = "tabs_scales",
+                    ## scale X ----
 
-                  ),#end tabPanel
-                  ## scale Y ----
-                  nav_panel("Scale Y",
-                            layout_columns(
-                              col_widths = c(3, 9),
-                              mod_sidebar_scale_ui("sidebar_scale_Y"),
-                              mod_scale_ui("scale_Y")
-                            )
+                    nav_panel("Scale X",
+                              layout_columns(
+                                col_widths = c(3, 9),
+                                mod_sidebar_scale_ui("sidebar_scale_X"),
+                                mod_scale_ui("scale_X")
+                              ),
 
-                  )
-                ),#end tabSetPanel
-                fluidRow(
+                    ),#end tabPanel
+                    ## scale Y ----
+                    nav_panel("Scale Y",
+                              layout_columns(
+                                col_widths = c(3, 9),
+                                mod_sidebar_scale_ui("sidebar_scale_Y"),
+                                mod_scale_ui("scale_Y")
+                              )
 
-                  column(
-                    width = 6,
-                    offset = 4,
+                    )
+                  ),#end tabSetPanel
+                  fluidRow(
 
-                    p(),
-                    p()
+                    column(
+                      width = 6,
+                      offset = 4,
+
+                      p(),
+                      p()
+                    )
                   )
                 )
       ),
