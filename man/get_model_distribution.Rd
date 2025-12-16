@@ -7,7 +7,7 @@
 get_model_distribution(type, K = 5)
 }
 \arguments{
-\item{type}{Type of model distribution. Must be either \code{"centered"}, \code{"agree"}, or \code{"polarized"}.}
+\item{type}{Type of model distribution. Must be either \code{"centered"}, \code{"agreed"}, or \code{"polarized"}.}
 
 \item{K}{Number of response categories. Must be either 5, 7, or 9.}
 }

@@ -12,6 +12,7 @@
 mod_bias_ui <- function(id) {
   ns <- NS(id)
   tagList(
+
     card(
       full_screen = TRUE,
       card_header("Contaminated distribution"),
@@ -35,9 +36,9 @@ mod_bias_ui <- function(id) {
       card_header("Bias plot"),
       #plotOutput(ns("bias_plot"))
       plotlyOutput(ns("bias_plot"))
-
-
-    )
+    ),
+    p(),
+    p()
   )
 }
 
@@ -52,6 +53,7 @@ mod_bias_server <- function(id, r){
       r$type_cont_distribution_X
       r$K_X
       r$straightat_X},{
+        validate(need(!is.null(r$K_X), "The number of categories should be >1."))
         r$prop_cont <- get_contam_distribution(type = r$type_cont_distribution_X,
                                                K = r$K_X,
                                                straightat = r$straightat_X)

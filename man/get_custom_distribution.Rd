@@ -8,7 +8,7 @@ get_custom_distribution(type, K = 5, mean = 0, sd = 1, skew = 0, session)
 }
 \arguments{
 \item{type}{Type of model distribution. Must be either \code{"centered"},
-\code{"agree"}, \code{"polarized"} or \code{"customized"}.}
+\code{"agreed"}, \code{"polarized"} or \code{"customized"}.}
 
 \item{K}{Number of response categories. Must be either 5, 7, or 9 if `type`
 is different than `"customized"`.}
@@ -33,7 +33,7 @@ Get probability mass distributions for a prespecified model distribution
 }
 \details{
 The following types of model distribution: \code{"centered"},
-\code{"agree"} and \code{"polarized"} are generated based on the same
+\code{"agreed"} and \code{"polarized"} are generated based on the same
 probabilities as in [get_model_distribution()].
 The \code{"customized"} type is generated through
 [latent2likert::simulate_likert()].
