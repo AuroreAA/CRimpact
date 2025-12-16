@@ -57,10 +57,10 @@ mod_scale_server <- function(id, tab_name, r){
       r$skewness_X
     },
     {
-      r$prop_X <- get_custom_distribution(type = r$type_true_distribution_X,
-                                          K = r$K_X, mean = r$shift_X,
-                                          sd = r$scale_X,
-                                          skew = r$skewness_X, session = session)
+      r$prop_X <- get_marginal(distribution = r$type_true_distribution_X,
+                               K = r$K_X,
+                               mean = r$shift_X, sd = r$scale_X,
+                               skew = r$skewness_X, session = session)
     }
     )
 
@@ -72,9 +72,9 @@ mod_scale_server <- function(id, tab_name, r){
       r$skewness_Y
     },
     {
-      r$prop_Y <- get_custom_distribution(type = r$type_true_distribution_Y,
-                                          K = r$K_Y, mean = r$shift_Y,
-                                          sd = r$scale_Y,
+      r$prop_Y <- get_marginal(distribution = r$type_true_distribution_Y,
+                                          K = r$K_Y,
+                                          mean = r$shift_Y, sd = r$scale_Y,
                                           skew = r$skewness_Y, session = session )
     }
     )

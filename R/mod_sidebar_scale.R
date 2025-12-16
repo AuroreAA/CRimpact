@@ -20,7 +20,8 @@ mod_sidebar_scale_ui <- function(id) {
       selectInput(
         ns("type_true_distribution"),
         label = "True distribution",
-        choices = c("centered","agreeing","polarized", "customized"),
+        #choices = c("centered","agreeing","polarized", "customized"),
+        choices = c("centered", "skewed", "polarized", "latent"),
         selected = "centered"
       ),
       div(id = ns("custom"),
@@ -101,7 +102,7 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
     observeEvent(input$type_true_distribution,{
       req(input$type_true_distribution)
 
-      if(input$type_true_distribution != "customized"){
+      if(input$type_true_distribution != "latent"){
         golem::invoke_js("hideid",ns("custom"))
       }else{
         golem::invoke_js("showid",ns("custom"))
@@ -115,25 +116,6 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
 
     })
 
-    observeEvent(r$K_X,{
-      req(r$K_X)
-
-      if(!(r$K_X %in% c(5,7,9))){
-        updateSelectInput(session, "type_true_distribution",
-                          selected = "customized", choices = "customized")
-      }else{
-        if (tab_name == "X"){
-          updateSelectInput(session, "type_true_distribution",
-                            selected = r$type_true_distribution_X,
-                              choices = c("centered","agreeing","polarized", "customized"))
-        }else{
-          updateSelectInput(session, "type_true_distribution",
-                            selected = r$type_true_distribution_Y,
-                            choices = c("centered","agreeing","polarized", "customized"))
-        }
-
-      }
-    })
 
 
     # Within-scale correlation between items in the X-scale

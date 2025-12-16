@@ -71,7 +71,7 @@ app_ui <- function(request) {
       ),
 
       # Results -----------------------------------------------------------------
-      nav_panel("Bias",
+      nav_panel("Impact",
                 navset_tab(
                   id = "tabs_bias",
                   ## Maximum bias ----
