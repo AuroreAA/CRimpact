@@ -48,18 +48,18 @@ mod_scale_ui <- function(id) {
 mod_scale_server <- function(id, tab_name, r){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
-    # Get PMF -------
+    # Get marginals -------
     observeEvent({
       r$type_true_distribution_X
       r$K_X
       r$shift_X
-      r$scale_X
+      r$sd_X
       r$skewness_X
     },
     {
-      r$prop_X <- get_marginal(distribution = r$type_true_distribution_X,
+      r$prob_X <- get_marginal(distribution = r$type_true_distribution_X,
                                K = r$K_X,
-                               mean = r$shift_X, sd = r$scale_X,
+                               mean = r$shift_X, sd = r$sd_X,
                                skew = r$skewness_X, session = session)
     }
     )
@@ -68,31 +68,61 @@ mod_scale_server <- function(id, tab_name, r){
       r$type_true_distribution_Y
       r$K_Y
       r$shift_Y
-      r$scale_Y
+      r$sd_Y
       r$skewness_Y
     },
     {
-      r$prop_Y <- get_marginal(distribution = r$type_true_distribution_Y,
-                                          K = r$K_Y,
-                                          mean = r$shift_Y, sd = r$scale_Y,
-                                          skew = r$skewness_Y, session = session )
+      r$prob_Y <- get_marginal(distribution = r$type_true_distribution_Y,
+                               K = r$K_Y,
+                               mean = r$shift_Y, sd = r$sd_Y,
+                               skew = r$skewness_Y, session = session )
     }
     )
 
 
+    # Get simple scale -----
+    observeEvent({
+      r$prob_X
+      r$K_X
+      r$rhoscale_X
+    },{
+      req(r$prob_X)
+      req(r$K_X)
+      req(r$rhoscale_X)
+      r$scale_X <- simple_scale(prob = r$prob_X,
+                                K = r$K_X,
+                                rho_w = r$rhoscale_X)
+    })
+
+
+    observeEvent({
+      r$prob_Y
+      r$K_Y
+      r$rhoscale_Y
+    },{
+      req(r$prob_Y)
+      req(r$K_Y)
+      req(r$rhoscale_Y)
+      r$scale_Y <- simple_scale(prob = r$prob_Y,
+                                K = r$K_Y,
+                                rho_w = r$rhoscale_Y)
+    })
+
+
+    # Internals reactive values -----------------------------------------------
     r_mod <- reactiveValues(
       dt = NULL,
       cronbach = NULL
     )
 
     observeEvent({
-      r$prop_X
-      r$prop_Y
+      r$prob_X
+      r$prob_Y
     },{
       if (tab_name == "X"){
-        r_mod$dt <- r$prop_X
+        r_mod$dt <- r$prob_X
       }else{
-        r_mod$dt <- r$prop_Y
+        r_mod$dt <- r$prob_Y
       }
       K <- length(r_mod$dt)
       r_mod$dt <- data.frame(t(r_mod$dt))

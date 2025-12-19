@@ -76,26 +76,34 @@ app_ui <- function(request) {
                   id = "tabs_bias",
                   ## Maximum bias ----
 
-                  nav_panel("Maximum Bias",
+                  nav_panel("Adversarial Impact",
                             layout_columns(
                               col_widths = c(3, 9),
-                              mod_sidebar_bias_ui("sidebar_bias_1"),
-                              mod_crimpact_ui("crimpact_1")
+                              mod_sidebar_adversarial_ui("sidebar_adversarial_1"),
+                              mod_adversarial_ui("adversarial_1")
                             ),
 
                   ),#end tabPanel
                   ## Bias ----
-                  nav_panel("Bias",
+                  # nav_panel("Bias",
+                  #           layout_columns(
+                  #             col_widths = c(3, 9),
+                  #             mod_sidebar_bias_ui("sidebar_bias_2"),
+                  #             mod_bias_ui("bias_1")
+                  #           )
+                  # ),
+
+                  ## Impact ----
+                  nav_panel("Careless Impact",
                             layout_columns(
                               col_widths = c(3, 9),
-                              mod_sidebar_bias_ui("sidebar_bias_2"),
-                              mod_bias_ui("bias_1")
+                              mod_sidebar_impact_ui("sidebar_impact_1"),
+                              mod_impact_ui("impact_1")
                             )
 
-                  )
+                  )#END tabPanel
                 ),#end tabSetPanel
-
-      ),#END tabPanel
+      ),
 
       # Help --------------------------------------------------------------------
       nav_panel("Info",

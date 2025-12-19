@@ -26,8 +26,8 @@ mod_sidebar_scale_ui <- function(id) {
       ),
       div(id = ns("custom"),
           numericInput(ns("shift"), "Shift value", 0, step = 0.1),
-          numericInput(ns("scale"), "Dispersion value", 1, min = 0, step = 0.1),
-          numericInput(ns("skewness"), "Assymetry value", 0, min = -0.95, max = 0.95, step = 0.05),
+          numericInput(ns("sd"), "Dispersion value", 1, min = 0, step = 0.1),
+          numericInput(ns("skewness"), "Asymmetry value", 0, min = -0.95, max = 0.95, step = 0.05),
           p(
             tags$small(
               tags$em(
@@ -154,9 +154,9 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
     })
 
     # sd parameter
-    observeEvent(input$scale,{
-      req(input$scale)
-      if(input$scale <= 0){
+    observeEvent(input$sd,{
+      req(input$sd)
+      if(input$sd <= 0){
         shinyWidgets::sendSweetAlert(
           session = session,
           title = "Warning",
@@ -165,14 +165,14 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
           html = FALSE
         )
       }
-      validate(need(input$scale > 0,
+      validate(need(input$sd > 0,
                     "The dispersion should be strictly positive." ))
 
 
       if(tab_name == "X"){
-        r$scale_X <- input$scale
+        r$sd_X <- input$sd
       }else{
-        r$scale_Y <- input$scale
+        r$sd_Y <- input$sd
       }
     })
 
@@ -194,7 +194,7 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
       r$type_true_distribution_Y <- r$type_true_distribution_X
       r$rhoscale_Y <- r$rhoscale_X
       r$shift_Y <- r$shift_X
-      r$scale_Y <- r$scale_X
+      r$sd_Y <- r$sd_X
       r$skewness_Y <- r$skewness_X
       r$sameXY <- input$sameXY
     })
@@ -228,11 +228,11 @@ mod_sidebar_scale_server <- function(id, tab_name, r){
         updateNumericInput(session, "shift",
                            value = r$shift_Y)
     })
-    observeEvent(r$scale_Y,{
-      req(r$scale_Y)
+    observeEvent(r$sd_Y,{
+      req(r$sd_Y)
       if(tab_name == "Y")
         updateNumericInput(session, "scale",
-                           value = r$scale_Y)
+                           value = r$sd_Y)
     })
     observeEvent(r$skewness_Y,{
       req(r$skewness_Y)
