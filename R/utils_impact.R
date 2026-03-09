@@ -130,14 +130,14 @@ bias_plot_new <- function (bias, digits = 2, type = c("Correlation", "Bias"))
   if(type == "Bias"){
     y_breakdown <- seq(-(1+rho), 1-rho, 0.02)
     gg <- gg +
-      geom_line(data = data.frame(x = breakdown, y = y_breakdown),
-                mapping = aes(x = x, y = y_breakdown,
-                              text = paste0(
-                                "Breakdown value: ",
-                                rep(scales::percent(breakdown, accuracy = 0.1),
-                                    length(y_breakdown))
-                              ), group = 1),
-                linetype = "dashed", color = "lightcoral") +
+      # geom_line(data = data.frame(x = breakdown, y = y_breakdown),
+      #           mapping = aes(x = x, y = y_breakdown,
+      #                         text = paste0(
+      #                           "Breakdown value: ",
+      #                           rep(scales::percent(breakdown, accuracy = 0.1),
+      #                               length(y_breakdown))
+      #                         ), group = 1),
+      #           linetype = "dashed", color = "lightcoral") +
       ylim(-(1+rho), 1-rho)
   }
   return(gg)
@@ -268,7 +268,7 @@ max_bias_plot_new <- function(maxbias, digits = 2,
     # geom_vline(xintercept = breakdown,
     #
     #            linetype = "dashed", color = "lightcoral") +
-
+    y_breakdown <- seq(-(1+rho), 1-rho, 0.02)
     gg <- gg +
       geom_line(data = data.frame(x = breakdown, y = y_breakdown),
                 mapping = aes(x = x, y = y_breakdown,
