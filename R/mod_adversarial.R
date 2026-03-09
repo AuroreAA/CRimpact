@@ -36,6 +36,7 @@ mod_adversarial_server <- function(id, r){
       epsilon = seq(from = 0, to = 0.5, by = 0.01)
       r$max_bias <- max_bias(r$model_XY,
                                  epsilon = epsilon)
+
       r$breakdown <- breakdown(r$model_XY)
     })
 

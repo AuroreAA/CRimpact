@@ -109,13 +109,37 @@ bias_plot_new <- function (bias, digits = 2, type = c("Correlation", "Bias"))
                  type, ": ", bias
                ),  group = 1)) +
     geom_line() +
-    {if(type == "Correlation")  geom_hline(yintercept = rho,
-                                           linetype = "dashed",
-                                           color = "lightcoral"
-    )}+
     scale_x_continuous(labels = scales::percent)+
-    ylim(-2, 2) +
     xlab("Contamination fraction") + ylab(type)
+
+
+
+  if(type == "Correlation"){
+    gg <- gg +
+      #geom_hline(yintercept = rho, linetype = "dashed", color = "lightcoral") +
+      geom_line(data = data.frame(x = eps, y = rho),
+                mapping = aes(x = eps, y = rho,
+                              text = paste0(
+                                "True correlation: ",
+                                rep(scales::percent(rho, accuracy = 0.1),
+                                    length(eps))
+                              ), group = 1),
+                linetype = "dashed", color = "lightcoral") +
+      ylim(-1, 1)
+  }
+  if(type == "Bias"){
+    y_breakdown <- seq(-(1+rho), 1-rho, 0.02)
+    gg <- gg +
+      geom_line(data = data.frame(x = breakdown, y = y_breakdown),
+                mapping = aes(x = x, y = y_breakdown,
+                              text = paste0(
+                                "Breakdown value: ",
+                                rep(scales::percent(breakdown, accuracy = 0.1),
+                                    length(y_breakdown))
+                              ), group = 1),
+                linetype = "dashed", color = "lightcoral") +
+      ylim(-(1+rho), 1-rho)
+  }
   return(gg)
 }
 
@@ -193,7 +217,7 @@ breakdown <- function(model) {
 
 max_bias_plot_new <- function(maxbias, digits = 2,
                               type = c("Correlation", "Bias"),
-                              direction = c("Upward", "Downward", "default"),
+                              direction = c("Upward", "Downward", "Maximum"),
                               breakdown){
 
   # initializations
@@ -204,7 +228,7 @@ max_bias_plot_new <- function(maxbias, digits = 2,
   # B <- numeric()
   # txt <- character()
   type_name <- ifelse(type == "Correlation", "rho", "bias")
-  direction <- ifelse(direction == "default", ifelse(rho < 0, "upward", "downward"),
+  direction <- ifelse(direction == "Maximum", ifelse(rho < 0, "Upward", "Downward"),
                       direction)
 
   direction <- tolower(direction)
@@ -222,17 +246,39 @@ max_bias_plot_new <- function(maxbias, digits = 2,
                                "<br>",
                                type, ": ",  maxbias
                              ),  group = 1)) +
-    {if(type == "Correlation")  geom_hline(yintercept = rho,
-                                           linetype = "dashed",
-                                           color = "lightcoral"
-    )}+
-    {if(type == "Bias")  geom_hline(yintercept = breakdown,
-                                           linetype = "dashed",
-                                           color = "lightcoral"
-    )}+
     geom_line() +
-    scale_x_continuous(labels = scales::percent)+
-    ylim(-2, 2) +
+    scale_x_continuous(labels = scales::percent) +
     xlab("Contamination fraction") + ylab(txt)
+
+  if(type == "Correlation"){
+    gg <- gg +
+      #geom_hline(yintercept = rho, linetype = "dashed", color = "lightcoral") +
+      geom_line(data = data.frame(x = eps, y = rho),
+                mapping = aes(x = eps, y = rho,
+                              text = paste0(
+                                "True correlation: ",
+                                rep(scales::percent(rho, accuracy = 0.1),
+                                    length(eps))
+                              ), group = 1),
+                linetype = "dashed", color = "lightcoral") +
+
+      ylim(-1, 1)
+  }
+  if(type == "Bias"){
+    # geom_vline(xintercept = breakdown,
+    #
+    #            linetype = "dashed", color = "lightcoral") +
+
+    gg <- gg +
+      geom_line(data = data.frame(x = breakdown, y = y_breakdown),
+                mapping = aes(x = x, y = y_breakdown,
+                              text = paste0(
+                                "Breakdown value: ",
+                                rep(scales::percent(breakdown, accuracy = 0.1),
+                                    length(y_breakdown))
+                              ), group = 1),
+                linetype = "dashed", color = "lightcoral")
+
+  }
   return(gg)
 }

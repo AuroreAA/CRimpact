@@ -21,7 +21,7 @@ mod_sidebar_adversarial_ui <- function(id) {
     ),
     card(
       full_screen = FALSE,
-      max_height = 350,
+      min_height = 350,
       card_header("Adversarial impact"),
       selectInput(
         ns("measure"),
@@ -32,8 +32,8 @@ mod_sidebar_adversarial_ui <- function(id) {
       selectInput(
         ns("direction"),
         label = "Direction",
-        choices = c("Upward", "Downward", "default"),
-        selected = "default"
+        choices = c("Upward", "Downward", "Maximum"),
+        selected = "Maximum"
       )
     )
 
