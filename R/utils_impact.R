@@ -121,8 +121,7 @@ bias_plot_new <- function (bias, digits = 2, type = c("Correlation", "Bias"))
                 mapping = aes(x = eps, y = rho,
                               text = paste0(
                                 "True correlation: ",
-                                rep(scales::percent(rho, accuracy = 0.1),
-                                    length(eps))
+                                rep(rho, length(eps))
                               ), group = 1),
                 linetype = "dashed", color = "lightcoral") +
       ylim(-1, 1)
@@ -257,7 +256,7 @@ max_bias_plot_new <- function(maxbias, digits = 2,
                 mapping = aes(x = eps, y = rho,
                               text = paste0(
                                 "True correlation: ",
-                                rep(scales::percent(rho, accuracy = 0.1),
+                                rep(rho,
                                     length(eps))
                               ), group = 1),
                 linetype = "dashed", color = "lightcoral") +
