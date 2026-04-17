@@ -14,24 +14,23 @@ mod_distri_ui <- function(id) {
     tags$ol(
       tags$li("Define the response distributions for", tags$a("scales X and Y",
                                                               href = "#", onclick = "$('a[data-value=\"Scales\"]').click();"), "."),
-      tags$li("Go to the",  tags$a("Bias tab", href = "#", onclick = "$('a[data-value=\"Bias\"]').click();"),
+      tags$li("Go to the",  tags$a("Impact tab", href = "#", onclick = "$('a[data-value=\"Impact\"]').click();"),
               " to measure the impact of careless responding.")
 
     ),
 
     tags$h5("Distribution Types"),
-    p("Scales X and Y must contain the same number of response categories."),
+    p("Scales X and Y must contain the same number of answer categories."),
     tags$ul(
       tags$li(
-        tags$b("Predefined distributions:"), "Available only for 5, 7, or 9 response categories.",
+        tags$b("Predefined distributions:"),
         tags$ul(
-
-          tags$li(tags$i("Centered:"), " Responses cluster around neutral categories."),
-          tags$li(tags$i("Agreeing:"), " Responses lean toward agreement."),
-          tags$li(tags$i("Polarized:"), " Responses concentrate at both extremes, indicating strong divergent opinions.")
+          tags$li(tags$i("centered:"), " Responses cluster around neutral categories."),
+          tags$li(tags$i("skewed:"), " Responses lean toward agreement."),
+          tags$li(tags$i("polarized:"), " Responses concentrate at both extremes, indicating strong divergent opinions.")
         )
       ),
-      tags$li(tags$b("Customized:"), " Define your own distribution using parameters in ",
+      tags$li(tags$b("Latent:"), " Define your own distribution using parameters in ",
 
               tags$a(
                 href = "https://cran.r-project.org/web/packages/latent2likert/refman/latent2likert.html#simulate_likert",

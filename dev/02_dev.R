@@ -26,9 +26,12 @@ golem::add_module(name = "sidebar_distri", with_test = TRUE) # Name of the modul
 golem::add_module(name = "scale", with_test = TRUE) # Name of the module
 golem::add_module(name = "sidebar_scale", with_test = TRUE) # Name of the module
 
-golem::add_module(name = "crimpact", with_test = TRUE) # Name of the module
-golem::add_module(name = "bias", with_test = TRUE) # Name of the module
-golem::add_module(name = "sidebar_bias", with_test = TRUE) # Name of the module
+golem::add_module(name = "adversarial", with_test = TRUE) # Name of the module
+golem::add_module(name = "sidebar_adversarial", with_test = TRUE) # Name of the module
+
+golem::add_module(name = "impact", with_test = TRUE) # Name of the module
+golem::add_module(name = "sidebar_impact", with_test = TRUE) # Name of the module
+
 
 golem::add_module(name = "info", with_test = FALSE) # Name of the module
 golem::add_module(name = "sidebar_info", with_test = FALSE) # Name of the module

@@ -54,7 +54,7 @@ mod_bias_server <- function(id, r){
       r$K_X
       r$straightat_X},{
         validate(need(!is.null(r$K_X), "The number of categories should be >1."))
-        r$prop_cont <- get_contam_distribution(type = r$type_cont_distribution_X,
+        r$prob_cont <- get_contam_distribution(type = r$type_cont_distribution_X,
                                                K = r$K_X,
                                                straightat = r$straightat_X)
       }
@@ -62,8 +62,8 @@ mod_bias_server <- function(id, r){
 
     # Bias curve plot output -------
     output$bias_plot <- renderPlotly({
-      req(r$prop_X)
-      req(r$prop_Y)
+      req(r$prob_X)
+      req(r$prob_Y)
       req(r$type_cont_distribution_X)
       req(r$type_cont_distribution_Y)
 
@@ -76,12 +76,12 @@ mod_bias_server <- function(id, r){
       req(r$straightat_Y)
 
       p <- bias_plot(
-        FX = r$prop_X,
+        FX = r$prob_X,
         HX = r$type_cont_distribution_X,
         rhoXY = r$rho_XY,
         rhoscaleX = r$rhoscale_X,
         JX = r$J_X,
-        FY = r$prop_Y,
+        FY = r$prob_Y,
         HY = r$type_cont_distribution_Y,
         rhoscaleY = r$rhoscale_Y,
         JY = r$J_Y,
@@ -104,9 +104,9 @@ mod_bias_server <- function(id, r){
     )
 
     observeEvent({
-      r$prop_cont
+      r$prob_cont
     },{
-      r_mod$dt <- r$prop_cont
+      r_mod$dt <- r$prob_cont
       K <- length(r_mod$dt)
       r_mod$dt <- data.frame(t(r_mod$dt))
       colnames(r_mod$dt) <- 1:K

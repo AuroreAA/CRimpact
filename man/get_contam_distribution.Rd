@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils_helpers.R
 \name{get_contam_distribution}
 \alias{get_contam_distribution}
-\title{Get probability mass distributions for a prespecified contaminating distribution}
+\title{Get probability mass distributions for a prespecified model distribution}
 \usage{
 get_contam_distribution(type, K = 5, straightat = 1)
 }
@@ -15,9 +15,11 @@ get_contam_distribution(type, K = 5, straightat = 1)
 }
 \value{
 PMF (numeric vector)
+
+PMF (numeric vector)
 }
 \description{
-Get probability mass distributions for a prespecified contaminating distribution
+Get probability mass distributions for a prespecified model distribution
 }
 \author{
 Max Welz

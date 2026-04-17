@@ -6,54 +6,59 @@
 #' @return PMF (numeric vector)
 #' @author Max Welz
 #' @export
-get_model_distribution <- function(type, K = 5)
-{
-  K <- as.integer(K)
-  stopifnot(K %in% c(5L, 7L, 9L))
-  pi <- numeric()
+# get_model_distribution <- function(type, K = 5)
+# {
+#   K <- as.integer(K)
+#   stopifnot(K %in% c(5L, 7L, 9L))
+#   pi <- numeric()
+#
+#
+#   if(identical(type, "centered"))
+#   {
+#     if(identical(K, 5L))
+#     {
+#       pi <- c(0.15, 0.2, 0.3, 0.2, 0.15)
+#     } else if(identical(K, 7L))
+#     {
+#       pi <- c(0.05, 0.125, 0.2, 0.25, 0.2, 0.125, 0.05)
+#     } else{
+#       pi <- c(0.025, 0.05, 0.15, 0.175, 0.2, 0.175, 0.15, 0.05, 0.025)
+#     } # IF centered
+#
+#   } else if(identical(type, "agreed"))
+#   {
+#     if(identical(K, 5L))
+#     {
+#       pi <- c(0.1, 0.15, 0.2, 0.25, 0.3)
+#     } else if(identical(K, 7L))
+#     {
+#       pi <- c(0.05, 0.075, 0.1, 0.125, 0.15, 0.225, 0.275)
+#     } else{
+#       pi <- c(0.025, 0.05, 0.075, 0.075, 0.1, 0.125, 0.15, 0.175, 0.225)
+#     } # IF agree
+#
+#   } else if(identical(type, "polarized"))
+#   {
+#     if(identical(K, 5L))
+#     {
+#       pi <- c(0.3, 0.175, 0.05, 0.175, 0.3)
+#     } else if(identical(K, 7L))
+#     {
+#       pi <- c(0.25, 0.15, 0.075, 0.05, 0.075, 0.15, 0.25)
+#     } else{
+#       pi <- c(0.24, 0.15, 0.05, 0.05, 0.02, 0.05, 0.05, 0.15, 0.24)
+#     } # IF polarized
+#
+#   } else stop("unknown type")
+#
+#   return(pi)
+#
+# }
 
 
-  if(identical(type, "centered"))
-  {
-    if(identical(K, 5L))
-    {
-      pi <- c(0.15, 0.2, 0.3, 0.2, 0.15)
-    } else if(identical(K, 7L))
-    {
-      pi <- c(0.05, 0.125, 0.2, 0.25, 0.2, 0.125, 0.05)
-    } else{
-      pi <- c(0.025, 0.05, 0.15, 0.175, 0.2, 0.175, 0.15, 0.05, 0.025)
-    } # IF centered
 
-  } else if(identical(type, "agreed"))
-  {
-    if(identical(K, 5L))
-    {
-      pi <- c(0.1, 0.15, 0.2, 0.25, 0.3)
-    } else if(identical(K, 7L))
-    {
-      pi <- c(0.05, 0.075, 0.1, 0.125, 0.15, 0.225, 0.275)
-    } else{
-      pi <- c(0.025, 0.05, 0.075, 0.075, 0.1, 0.125, 0.15, 0.175, 0.225)
-    } # IF agree
 
-  } else if(identical(type, "polarized"))
-  {
-    if(identical(K, 5L))
-    {
-      pi <- c(0.3, 0.175, 0.05, 0.175, 0.3)
-    } else if(identical(K, 7L))
-    {
-      pi <- c(0.25, 0.15, 0.075, 0.05, 0.075, 0.15, 0.25)
-    } else{
-      pi <- c(0.24, 0.15, 0.05, 0.05, 0.02, 0.05, 0.05, 0.15, 0.24)
-    } # IF polarized
 
-  } else stop("unknown type")
-
-  return(pi)
-
-}
 #' Get probability mass distributions for a prespecified contaminating distribution
 #'
 #' @param type Type of model distribution. Must be either \code{"random"}, \code{"straightlining"}, or \code{"extreme"}.
@@ -117,85 +122,85 @@ get_contam_distribution <- function(type, K = 5, straightat = 1)
 #' @import latent2likert
 #' @author Aurore Archimbaud and Max Welz
 #' @export
-get_custom_distribution <- function(type, K = 5, mean = 0, sd = 1,
-                                    skew = 0, session){
-  K <- as.integer(K)
-
-  pi <- numeric()
-
-  if(!(K %in% c(5L, 7L, 9L))& !(identical(type, "customized"))){
-    shinyWidgets::sendSweetAlert(
-      session = session,
-      title = "Warning",
-      text = "The number of answer categories for not customized distributions should be 5, 7 or 9.",
-      type = "warning",
-      html = FALSE
-    )
-    validate(need(K %in% c(5,7,9),
-                  "The number of answer categories should be 5, 7 or 9." ))
-  }
-
-
-  if((skew > 0.95 | skew < -0.95) & (identical(type, "customized"))){
-    shinyWidgets::sendSweetAlert(
-      session = session,
-      title = "Warning",
-      text = "Skewness must be between -0.95 and 0.95.",
-      type = "warning",
-      html = FALSE
-    )
-
-    validate(need(skew <= 0.95 & skew >= -0.95,
-                  "Skewness must be between -0.95 and 0.95."))
-  }
-
-  if (identical(type, "centered")) {
-    if (identical(K, 5L)) {
-      pi <- c(0.15, 0.2, 0.3, 0.2, 0.15)
-    }
-    else if (identical(K, 7L)) {
-      pi <- c(0.05, 0.125, 0.2, 0.25, 0.2, 0.125, 0.05)
-    }
-    else {
-      pi <- c(0.025, 0.05, 0.15, 0.175, 0.2, 0.175, 0.15,
-              0.05, 0.025)
-    }
-  }
-  else if (identical(type, "agreed")) {
-
-    if (identical(K, 5L)) {
-      pi <- c(0.1, 0.15, 0.2, 0.25, 0.3)
-    }
-    else if (identical(K, 7L)) {
-      pi <- c(0.05, 0.075, 0.1, 0.125, 0.15, 0.225, 0.275)
-    }
-    else {
-      pi <- c(0.025, 0.05, 0.075, 0.075, 0.1, 0.125, 0.15,
-              0.175, 0.225)
-    }
-  }
-  else if (identical(type, "polarized")) {
-
-    if (identical(K, 5L)) {
-      pi <- c(0.3, 0.175, 0.05, 0.175, 0.3)
-    }
-    else if (identical(K, 7L)) {
-      pi <- c(0.25, 0.15, 0.075, 0.05, 0.075, 0.15, 0.25)
-    }
-    else {
-      pi <- c(0.24, 0.15, 0.05, 0.05, 0.02, 0.05, 0.05,
-              0.15, 0.24)
-    }
-  }
-  else if (identical(type, "customized")) {
-    pi <- latent2likert::simulate_likert(n_levels = K,
-                                         cp = c(mean = mean, sd = sd, skew = skew))
-
-  }
-  else stop("unknown type")
-
-  return(pi)
-}
+# get_custom_distribution <- function(type, K = 5, mean = 0, sd = 1,
+#                                     skew = 0, session){
+#   K <- as.integer(K)
+#
+#   pi <- numeric()
+#
+#   if(!(K %in% c(5L, 7L, 9L))& !(identical(type, "customized"))){
+#     shinyWidgets::sendSweetAlert(
+#       session = session,
+#       title = "Warning",
+#       text = "The number of answer categories for not customized distributions should be 5, 7 or 9.",
+#       type = "warning",
+#       html = FALSE
+#     )
+#     validate(need(K %in% c(5,7,9),
+#                   "The number of answer categories should be 5, 7 or 9." ))
+#   }
+#
+#
+#   if((skew > 0.95 | skew < -0.95) & (identical(type, "customized"))){
+#     shinyWidgets::sendSweetAlert(
+#       session = session,
+#       title = "Warning",
+#       text = "Skewness must be between -0.95 and 0.95.",
+#       type = "warning",
+#       html = FALSE
+#     )
+#
+#     validate(need(skew <= 0.95 & skew >= -0.95,
+#                   "Skewness must be between -0.95 and 0.95."))
+#   }
+#
+#   if (identical(type, "centered")) {
+#     if (identical(K, 5L)) {
+#       pi <- c(0.15, 0.2, 0.3, 0.2, 0.15)
+#     }
+#     else if (identical(K, 7L)) {
+#       pi <- c(0.05, 0.125, 0.2, 0.25, 0.2, 0.125, 0.05)
+#     }
+#     else {
+#       pi <- c(0.025, 0.05, 0.15, 0.175, 0.2, 0.175, 0.15,
+#               0.05, 0.025)
+#     }
+#   }
+#   else if (identical(type, "agreed")) {
+#
+#     if (identical(K, 5L)) {
+#       pi <- c(0.1, 0.15, 0.2, 0.25, 0.3)
+#     }
+#     else if (identical(K, 7L)) {
+#       pi <- c(0.05, 0.075, 0.1, 0.125, 0.15, 0.225, 0.275)
+#     }
+#     else {
+#       pi <- c(0.025, 0.05, 0.075, 0.075, 0.1, 0.125, 0.15,
+#               0.175, 0.225)
+#     }
+#   }
+#   else if (identical(type, "polarized")) {
+#
+#     if (identical(K, 5L)) {
+#       pi <- c(0.3, 0.175, 0.05, 0.175, 0.3)
+#     }
+#     else if (identical(K, 7L)) {
+#       pi <- c(0.25, 0.15, 0.075, 0.05, 0.075, 0.15, 0.25)
+#     }
+#     else {
+#       pi <- c(0.24, 0.15, 0.05, 0.05, 0.02, 0.05, 0.05,
+#               0.15, 0.24)
+#     }
+#   }
+#   else if (identical(type, "customized")) {
+#     pi <- latent2likert::simulate_likert(n_levels = K,
+#                                          cp = c(mean = mean, sd = sd, skew = skew))
+#
+#   }
+#   else stop("unknown type")
+#
+#   return(pi)
+# }
 
 
 #' Cronbach alpha under our assumptions
