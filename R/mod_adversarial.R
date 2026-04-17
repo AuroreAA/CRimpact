@@ -7,6 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
+#' @import plotly
 mod_adversarial_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -51,13 +52,13 @@ mod_adversarial_server <- function(id, r){
       req(r$measure)
 
 
-      p <- max_bias_plot_new(
+      p <- max_bias_plot(
         r$max_bias,
         type = r$measure,
         direction = r$direction,
         digits = 3,
         breakdown = r$breakdown
-      )+
+      ) +
         theme_minimal()
 
       ggplotly(p, tooltip = "text")

@@ -78,7 +78,7 @@ mod_impact_server <- function(id, r){
       req(r$model_XY)
 
       epsilon = seq(from = 0, to = 0.5, by = 0.01)
-      r_mod$bias <- bias_new(r$model_XY,
+      r_mod$bias <- bias(r$model_XY,
                              epsilon = epsilon,
                              contamination = r_mod$contamination)
     })
@@ -156,7 +156,7 @@ mod_impact_server <- function(id, r){
 
 
 
-      p <- bias_plot_new(
+      p <- bias_plot(
         r_mod$bias,
         type = r$measure,
         digits = 3

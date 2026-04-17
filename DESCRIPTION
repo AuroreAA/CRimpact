@@ -1,6 +1,6 @@
 Package: CRimpact
 Title: Careless Responding Impact
-Version: 0.0.0.9000
+Version: 0.0.1.0000
 Authors@R: c(
     person("Aurore", "Archimbaud", , "aurore.archimbaud@live.fr", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6511-9091")),
@@ -26,6 +26,7 @@ Imports:
     utils
 Suggests: 
     knitr,
+    qgraph,
     rmarkdown,
     spelling,
     testthat (>= 3.0.0)

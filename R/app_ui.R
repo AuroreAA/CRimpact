@@ -21,7 +21,7 @@ app_ui <- function(request) {
       # Instructions --------------------------------------------------------------
       nav_panel(title = "Instructions",
 
-                mod_distri_ui("distri_1")
+                mod_instructions_ui("instructions_1")
       ),
       # Scales --------------------------------------------------------------
       nav_panel(title = "Scales",
@@ -84,14 +84,6 @@ app_ui <- function(request) {
                             ),
 
                   ),#end tabPanel
-                  ## Bias ----
-                  # nav_panel("Bias",
-                  #           layout_columns(
-                  #             col_widths = c(3, 9),
-                  #             mod_sidebar_bias_ui("sidebar_bias_2"),
-                  #             mod_bias_ui("bias_1")
-                  #           )
-                  # ),
 
                   ## Impact ----
                   nav_panel("Careless Impact",
@@ -116,16 +108,6 @@ app_ui <- function(request) {
 
     )
 
-    # Footer ------------------------------------------------------------------
-    # tags$footer(
-    #   div(
-    #     column(width = 6,   paste("2024", paste("Version",  utils::packageVersion("CRimpact")), sep = " | "),
-    #            style = "width:500px; height:40px;color: #000000;
-    #              padding: 10px;", align = "left"), #color: #242A75
-    #     style =       "width:100%; height:40px;
-    #   background-color: #E4E4E8;bottom:0;position:fixed;cursor:inherit;" #rgba(0,0,0,0.1)#position:fixed;cursor:inherit;
-    #
-    #   )
 
     # # Footer ------------------------------------------------------------------
     # tags$footer(

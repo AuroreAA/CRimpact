@@ -47,6 +47,7 @@ usethis::use_package("scales")
 usethis::use_package("latent2likert")
 usethis::use_package("bslib")
 usethis::use_package("utils")
+usethis::use_package("qgraph", type = "Suggests")
 
 
 

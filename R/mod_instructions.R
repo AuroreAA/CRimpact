@@ -1,4 +1,4 @@
-#' distri UI Function
+#' instructions UI Function
 #'
 #' @description A shiny Module.
 #'
@@ -7,7 +7,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
-mod_distri_ui <- function(id) {
+mod_instructions_ui <- function(id) {
   ns <- NS(id)
   tagList(
     tags$h5("Instructions"),
@@ -64,14 +64,14 @@ mod_distri_ui <- function(id) {
 #' distri Server Functions
 #'
 #' @noRd
-mod_distri_server <- function(id, r){
+mod_instructions_server <- function(id, r){
   moduleServer(id, function(input, output, session){
     ns <- session$ns
   })
 }
 
 ## To be copied in the UI
-# mod_distri_ui("distri_1")
+# mod_instructions_ui("instructions_1")
 
 ## To be copied in the server
-# mod_distri_server("distri_1")
+# mod_instructions_server("instructions_1")

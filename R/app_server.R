@@ -58,7 +58,6 @@ app_server <- function(input, output, session) {
 
   # Distribution
   mod_sidebar_distri_server("sidebar_distri_1", r)
-  mod_distri_server("distri_1", r)
 
   # Scale
   mod_sidebar_scale_server("sidebar_scale_X", tab_name = "X", r)
@@ -70,12 +69,6 @@ app_server <- function(input, output, session) {
   # Adversarial impact
   mod_sidebar_adversarial_server("sidebar_adversarial_1", r)
   mod_adversarial_server("adversarial_1", r)
-  # mod_sidebar_bias_server("sidebar_bias_1", tab_name = "crimpact", r)
-  # mod_crimpact_server("crimpact_1", r)
-
-  # # Bias
-  # mod_sidebar_bias_server("sidebar_bias_2", tab_name = "bias", r)
-  # mod_bias_server("bias_1", r)
 
   # Careless impact
   mod_sidebar_impact_server("sidebar_impact_1", r)

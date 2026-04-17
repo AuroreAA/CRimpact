@@ -4,7 +4,10 @@
 # ************************************
 
 
-# utility function for marginal distribution
+#' utility function for marginal distribution
+#' @importFrom latent2likert simulate_likert
+#' @author Andreas Alfons
+#' @noRd
 get_marginal <- function(distribution = c("uniform", "centered", "skewed",
                                           "polarized", "latent"),
                          K = 5L, target = c("all", "extreme"),
@@ -38,20 +41,6 @@ get_marginal <- function(distribution = c("uniform", "centered", "skewed",
       sd <- 1
       skew <- 0
     }
-
-    if((skew > 0.95 | skew < -0.95) & (identical(distribution, "latent"))){
-      shinyWidgets::sendSweetAlert(
-        session = session,
-        title = "Warning",
-        text = "Assymetry value must be between -0.95 and 0.95.",
-        type = "warning",
-        html = FALSE
-      )
-
-      validate(need(skew <= 0.95 & skew >= -0.95,
-                    "Assymetry value must be between -0.95 and 0.95."))
-    }
-
     # obtain probabilities of discrete rating scale using the procedure of
     # Boari & Nai Ruscone (2015)
     parameters <- c(mu = mean, sd = sd, skew = skew)
@@ -66,100 +55,311 @@ get_marginal <- function(distribution = c("uniform", "centered", "skewed",
 }
 
 
-# obtain relevant quantities for the model distribution from a data set
-# get_model <- function(X, Y, cat_X = NULL, cat_Y = cat_X,
-#                       a = rep.int(1/p, p), b = rep.int(1/q, q)) {
-#
-#   # initializations
-#   X <- as.matrix(X)
-#   Y <- as.matrix(Y)
-#   n <- nrow(X)
-#   if (nrow(Y) != n) {
-#     stop("'X' and 'Y' must contain the same number of observations")
-#   }
-#   if (n < 2) {
-#     stop("'X' and 'Y' contain too few observations for computing variances ",
-#          "and covariances")
-#   }
-#   p <- ncol(X)
-#   if (p == 0) stop("'X' does not contain any items")
-#   q <- ncol(Y)
-#   if (q == 0) stop("'Y' does not contain any items")
-#   if (length(a) != p) stop("weight vector 'a' must be of length ", p)
-#   if (length(b) != q) stop("weight vector 'b' must be of length ", q)
-#
-#   # number of rating categories (may differ for X and Y)
-#   if (is.null(cat_X)) observed_cat_X <- sort(unique(as.vector(X)))
-#   else observed_cat_X <- cat_X
-#   K_X <- length(observed_cat_X)
-#   if (is.null(cat_Y)) observed_cat_Y <- sort(unique(as.vector(Y)))
-#   else observed_cat_Y <- cat_Y
-#   K_Y <- length(observed_cat_Y)
-#
-#   # we use a centered scale of subsequent integers
-#   cat_X <- seq_len(K_X) - (1 + K_X) / 2
-#   cat_Y <- seq_len(K_Y) - (1 + K_Y) / 2
-#
-#   # bound of support
-#   M_X <- cat_X[K_X]
-#   M_Y <- cat_Y[K_Y]
-#
-#   # keys of items are taken as the signs of the weight vectors
-#   keys_X <- sign(a)
-#   keys_Y <- sign(b)
-#
-#   # # make sure that X and Y are on a centered scale of subsequent integers
-#   # # TODO: there should be an argument whether this should be enforced
-#   # # (for the big5 application, we should not do this due to some non-integer
-#   # # values in the data, likely from imputation)
-#   # if (!identical(observed_cat_X, cat_X)) {
-#   #   names(cat_X) <- observed_cat_X
-#   #   X <- matrix(cat_X[as.character(X)], nrow = n, ncol = p)
-#   #   names(cat_X) <- NULL
-#   # }
-#   # if (!identical(observed_cat_Y, cat_Y)) {
-#   #   names(cat_Y) <- observed_cat_Y
-#   #   Y <- matrix(cat_Y[as.character(Y)], nrow = n, ncol = q)
-#   #   names(cat_Y) <- NULL
-#   # }
-#
-#   # compute means and covariance matrices to be used as true values
-#   mean_X <- colMeans(X)
-#   mean_Y <- colMeans(Y)
-#   cov_X <- cov(X)
-#   cov_Y <- cov(Y)
-#   cov_XY <- cov(X, Y)
-#
-#   # bounds of support of linear combinations
-#   M_U <- sum(abs(a)) * M_X
-#   M_V <- sum(abs(b)) * M_Y
-#
-#   # compute quantities of linear combinations to be used as true values
-#   mean_U <- drop(crossprod(a, mean_X))
-#   mean_V <- drop(crossprod(b, mean_Y))
-#   var_U <- drop(crossprod(a, cov_X) %*% a)
-#   var_V <- drop(crossprod(b, cov_Y) %*% b)
-#   cov_UV <- drop(crossprod(a, cov_XY) %*% b)
-#
-#   # return list of relevant quantities of model distribution
-#   list(
-#     X = list(cat = cat_X, K = K_X, M = M_X, keys = keys_X,
-#              mean = mean_X, cov = cov_X),
-#     Y = list(cat = cat_Y, K = K_Y, M = M_Y, keys = keys_Y,
-#              mean = mean_Y, cov = cov_Y),
-#     cov_XY = cov_XY, a = a, b = b,
-#     U = list(M = M_U, mean = mean_U, var = var_U),
-#     V = list(M = M_V, mean = mean_V, var = var_V),
-#     cov_UV = cov_UV,
-#     rho = cov_UV / (sqrt(var_U) * sqrt(var_V))
-#   )
-#
-# }
+#' Model distribution based on empirical data
+#'
+#' Obtain relevant quantities for the model distribution from data on ordinal
+#' measurement scales. These quantities include means, within-scale covariance
+#' matrices, and between-scale cross-covariance matrices, as well as analogous
+#' quantities for specified linear combinations of items.
+#'
+#' @param X  matrix of observations on an ordinal measurement scale consisting
+#' of `p` items.
+#' @param Y  matrix of observations on an ordinal measurement scale consisting
+#' of `q` items.
+#' @param cat_X  vector of response categories in the ordinal measurement scale
+#' from `X`.  If `NULL` (the default), the unique observed values in `X` are
+#' used.
+#' @param cat_Y  vector of response categories in the ordinal measurement scale
+#' from `Y`.  If `NULL` (the default), the unique observed values in `Y` are
+#' used.
+#' @param a  weight vector for computing a linear combination of items in the
+#' ordinal measurement scale from `X`.
+#' @param b  weight vector for computing a linear combination of items in the
+#' ordinal measurement scale from `Y`.
+#'
+#' @return A list with the following components:
+#' \item{X, Y}{each is a list with the following components detailing the
+#' distribution of the ordinal measurement scale:
+#' \itemize{
+#'   \item{`cat`: vector of response categories, encoded as `-M`, `-M+1`,
+#'   \dots, `M-1`, `M`.}
+#'   \item{`K`: number of response categories.}
+#'   \item{`M`: upper bound of the support region of the items, with the
+#'   lower bound given by `-M`.}
+#'   \item{`keys`: vector indicating whether items are positively keyed (`1`)
+#'   or negatively keyed (`-1`). Its elements are simply derived as the signs
+#'   of the weight vector of the linear combination.}
+#'   \item{`mean`: vector of means of the items.}
+#'   \item{`cov`: covariance matrix of the items.}
+#' }
+#' }
+#' \item{cov_XY}{cross-covariance matrix of the measurement scales.}
+#' \item{a}{weight vector for the linear combination `U` of items in the
+#' ordinal measurement scale from `X`.}
+#' \item{b}{weight vector for the linear combination `V` of items in the
+#' ordinal measurement scale from `Y`.}
+#' \item{U, V}{each is a list with the following components detailing the
+#' distribution of the linear combination of the ordinal measurement scale:
+#' \itemize{
+#'   \item{`M`: upper bound of the support region of the linear combination,
+#'   with the lower bound given by `-M`.}
+#'   \item{`mean`: mean of the linear combination.}
+#'   \item{`var`: variance of the linear combination.}
+#' }
+#' }
+#' \item{cov_UV}{covariance between the linear combinations of the ordinal
+#' measurement scales.}
+#' \item{rho}{correlation between the linear combinations of the ordinal
+#' measurement scales.}
+#'
+#' @author Andreas Alfons
+#'
+#' @references
+#' M. Welz, A. Archimbaud, A. Alfons (2026). Quantifying the impact of careless
+#' responding. PsyArXiv. \doi{10.31234/osf.io/8fj6p_v2}.
+#'
+#' @seealso
+#' [careless()], [reversed()], [adversarial()]
+#'
+#' [bias()], [max_bias()], [breakdown()]
+#'
+#'
+#' @examples
+#' # Neo PI-R measurement of Big Five personality traits
+#' if (requireNamespace("qgraph", quietly = TRUE)) {
+#' data("big5", package = "qgraph")
+#' data("big5groups", package = "qgraph")
+#'
+#' # keys of items as per Neo PI-R form
+#' keys <- c(
+#'   -1,  1,  1, -1,  1,  1, -1, -1,  1, -1,
+#'   -1,  1,  1, -1,  1,  1, -1, -1,  1, -1,
+#'   -1,  1,  1, -1,  1,  1, -1, -1,  1, -1,
+#'   1, -1, -1,  1,  1, -1,  1,  1, -1,  1,
+#'   1, -1, -1,  1, -1, -1,  1,  1, -1,  1,
+#'   1, -1, -1,  1, -1, -1,  1,  1, -1,  1,
+#'   -1,  1,  1, -1,  1,  1, -1, -1,  1, -1,
+#'   -1,  1,  1, -1,  1,  1, -1, -1,  1, -1,
+#'   -1,  1,  1, -1,  1,  1, -1, -1,  1, -1,
+#'   1, -1, -1,  1, -1, -1,  1,  1, -1,  1,
+#'   1, -1, -1,  1, -1, -1,  1,  1, -1,  1,
+#'   1, -1, -1,  1, -1, -1,  1,  1, -1,  1,
+#'   -1,  1,  1, -1,  1,  1, -1, -1,  1, -1,
+#'   1,  1,  1, -1,  1,  1, -1, -1,  1, -1,
+#'   -1,  1,  1, -1,  1,  1, -1, -1,  1, -1,
+#'   1,  1, -1,  1, -1, -1,  1,  1, -1,  1,
+#'   1, -1, -1,  1,  1, -1,  1,  1, -1,  1,
+#'   1,  1, -1,  1, -1, -1,  1,  1,  1,  1,
+#'   -1,  1, -1,  1,  1,  1, -1,  1, -1, -1,
+#'   1,  1,  1,  1,  1,  1,  1, -1, -1,  1,
+#'   1,  1,  1,  1, -1, -1, -1, -1,  1,  1,
+#'   1,  1, -1,  1,  1,  1,  1,  1, -1, -1,
+#'   1, -1,  1,  1,  1,  1,  1, -1, -1,  1,
+#'   -1,  1,  1, -1,  1, -1,  1, -1,  1,  1
+#' )
+#'
+#' # extract scales and weight vectors for
+#' # Extraversion and Conscientiousness
+#' X <- big5[, big5groups$Extraversion]
+#' Y <- big5[, big5groups$Conscientiousness]
+#' a <- keys[big5groups$Extraversion] / ncol(X)
+#' b <- keys[big5groups$Conscientiousness] / ncol(Y)
+#' cat <- min(big5):max(big5)
+#'
+#' # obtain model distribution from empirical data
+#' model_XY <- get_model(X, Y, cat_X = cat, cat_Y = cat,
+#'                       a = a, b = b)
+#'
+#' # contamination fractions
+#' eps <- c(0, 0.1, 0.2, 0.3, 0.4, 0.49)
+#'
+#' # bias under straightlining at extreme response categories
+#' bias(model_XY, epsilon = eps, contamination = "careless",
+#'      type = "straightlining", target = "extreme")
+#' }
+#'
+#' @importFrom stats cov
+#' @export
+
+get_model <- function(X, Y, cat_X = NULL, cat_Y = NULL,
+                      a = rep.int(1/p, p), b = rep.int(1/q, q)) {
+
+  # initializations
+  X <- as.matrix(X)
+  Y <- as.matrix(Y)
+  n <- nrow(X)
+  if (nrow(Y) != n) {
+    stop("'X' and 'Y' must contain the same number of observations")
+  }
+  if (n < 2) {
+    stop("'X' and 'Y' contain too few observations for computing variances ",
+         "and covariances")
+  }
+  p <- ncol(X)
+  if (p == 0) stop("'X' does not contain any items")
+  q <- ncol(Y)
+  if (q == 0) stop("'Y' does not contain any items")
+  if (length(a) != p) stop("weight vector 'a' must be of length ", p)
+  if (length(b) != q) stop("weight vector 'b' must be of length ", q)
+
+  # number of rating categories (may differ for X and Y)
+  if (is.null(cat_X)) observed_cat_X <- sort(unique(as.vector(X)))
+  else observed_cat_X <- cat_X
+  K_X <- length(observed_cat_X)
+  if (is.null(cat_Y)) observed_cat_Y <- sort(unique(as.vector(Y)))
+  else observed_cat_Y <- cat_Y
+  K_Y <- length(observed_cat_Y)
+
+  # we use a centered scale of subsequent integers
+  cat_X <- seq_len(K_X) - (1 + K_X) / 2
+  cat_Y <- seq_len(K_Y) - (1 + K_Y) / 2
+
+  # bound of support
+  M_X <- cat_X[K_X]
+  M_Y <- cat_Y[K_Y]
+
+  # keys of items are taken as the signs of the weight vectors
+  keys_X <- sign(a)
+  keys_Y <- sign(b)
+
+  # # make sure that X and Y are on a centered scale of subsequent integers
+  # # TODO: there should be an argument whether this should be enforced
+  # # (for the big5 application, we should not do this due to some non-integer
+  # # values in the data, likely from imputation)
+  # if (!identical(observed_cat_X, cat_X)) {
+  #   names(cat_X) <- observed_cat_X
+  #   X <- matrix(cat_X[as.character(X)], nrow = n, ncol = p)
+  #   names(cat_X) <- NULL
+  # }
+  # if (!identical(observed_cat_Y, cat_Y)) {
+  #   names(cat_Y) <- observed_cat_Y
+  #   Y <- matrix(cat_Y[as.character(Y)], nrow = n, ncol = q)
+  #   names(cat_Y) <- NULL
+  # }
+
+  # compute means and covariance matrices to be used as true values
+  mean_X <- colMeans(X)
+  mean_Y <- colMeans(Y)
+  cov_X <- cov(X)
+  cov_Y <- cov(Y)
+  cov_XY <- cov(X, Y)
+
+  # bounds of support of linear combinations
+  M_U <- sum(abs(a)) * M_X
+  M_V <- sum(abs(b)) * M_Y
+
+  # compute quantities of linear combinations to be used as true values
+  mean_U <- drop(crossprod(a, mean_X))
+  mean_V <- drop(crossprod(b, mean_Y))
+  var_U <- drop(crossprod(a, cov_X) %*% a)
+  var_V <- drop(crossprod(b, cov_Y) %*% b)
+  cov_UV <- drop(crossprod(a, cov_XY) %*% b)
+
+  # return list of relevant quantities of model distribution
+  list(
+    X = list(cat = cat_X, K = K_X, M = M_X, keys = keys_X,
+             mean = mean_X, cov = cov_X),
+    Y = list(cat = cat_Y, K = K_Y, M = M_Y, keys = keys_Y,
+             mean = mean_Y, cov = cov_Y),
+    cov_XY = cov_XY, a = a, b = b,
+    U = list(M = M_U, mean = mean_U, var = var_U),
+    V = list(M = M_V, mean = mean_V, var = var_V),
+    cov_UV = cov_UV,
+    rho = cov_UV / (sqrt(var_U) * sqrt(var_V))
+  )
+
+}
 
 
-# obtain relevant quantities of a simplified scale in which all items have the
-# same marginal distribution and within-scale correlation (an alternative view
-# is that we control the weighted average within-scale correlation)
+#' Stylized ordinal measurement scale
+#'
+#' Generate relevant quantities of a stylized ordinal measurement scale
+#' in which items have equal marginal response distributions and equal
+#' correlations.  Analogous quantities are generated for a specified
+#' linear combination of items.
+#'
+#' @param prob  type of marginal response distribution. The choices
+#' `"centered"`, `"skewed"`, and `"polarized"` allow to quickly generate
+#' marginal response probabilities with the corresponding property. If
+#' `"latent"`, the marginal response probabilities are generated based on a
+#' latent skew-normal distribution via function
+#' \code{\link[latent2likert]{simulate_likert}()}.
+#' @param K  number of response categories.
+#' @param length  number of items in the ordinal measurement scale.
+#' @param rho_w  correlation between the items in the ordinal measurement scale.
+#' @param w  weight vector for computing a linear combination of items in the
+#' ordinal measurement scale.
+#' @param \dots  if `prob = "latent"`, the centered parameters of the latent
+#' skew-normal distribution can be specified through the following additional
+#' arguments:
+#' - `mean`: mean (defaults to 0).
+#' - `sd`: standard deviation (defaults to 1)
+#' - `skew`: skweness (defaults to 0, must be between -0.95 and 0.95)
+#'
+#' @return A list with the following components:
+#' \item{scale}{a list with the following components detailing the
+#' distribution of the ordinal measurement scale:
+#' \itemize{
+#'   \item{`cat`: vector of response categories, encoded as `-M`, `-M+1`,
+#'   \dots, `M-1`, `M`.}
+#'   \item{`prob`: vector of response probabilites, shared by all items.}
+#'   \item{`K`: number of response categories.}
+#'   \item{`M`: upper bound of the support region of the items, with the
+#'   lower bound given by `-M`.}
+#'   \item{`keys`: vector indicating whether items are positively keyed (`1`)
+#'   or negatively keyed (`-1`). Its elements are simply derived as the signs
+#'   of the weight vector of the linear combination.}
+#'   \item{`mean`: vector of means of the items.}
+#'   \item{`cov`: covariance matrix of the items.}
+#' }
+#' }
+#' \item{w}{weight vector for the linear combination of items in the
+#' ordinal measurement scale.}
+#' \item{score}{a list with the following components detailing the distribution
+#' of the linear combination of the ordinal measurement scale:
+#' \itemize{
+#'   \item{`M`: upper bound of the support region of the linear combination,
+#'   with the lower bound given by `-M`.}
+#'   \item{`mean`: mean of the linear combination.}
+#'   \item{`var`: variance of the linear combination.}
+#' }
+#' }
+#'
+#' @author Andreas Alfons
+#'
+#' @references
+#' M. Welz, A. Archimbaud, A. Alfons (2026). Quantifying the impact of careless
+#' responding. PsyArXiv. \doi{10.31234/osf.io/8fj6p_v2}.
+#'
+#' @seealso [simple_model()]
+#'
+#' @examples
+#' # centered distribution
+#' scale_X <- simple_scale(prob = "centered", K = 9,
+#'                         length = 5, rho_w = 0.4)
+#'
+#' # this is actually equivalent to:
+#' scale_Y <- simple_scale(prob = "latent", mean = 0, sd = 0.9,
+#'                         skew = 0, K = 9, length = 5,
+#'                         rho_w = 0.4)
+#' all.equal(scale_X, scale_Y)
+#'
+#' # skewed distribution
+#' scale_X <- simple_scale(prob = "skewed", K = 9,
+#'                         length = 5, rho_w = 0.4)
+#'
+#' # this is actually equivalent to:
+#' scale_Y <- simple_scale(prob = "latent", mean = 0, sd = 1.1,
+#'                         skew = -0.95, K = 9, length = 5,
+#'                         rho_w = 0.4)
+#' all.equal(scale_X, scale_Y)
+#'
+#' # polarized distribution
+#' scale_X <- simple_scale(prob = "polarized", K = 9,
+#'                         length = 5, rho_w = 0.4)
+#'
+#' @export
+
 simple_scale <- function(prob = c("centered", "skewed", "polarized", "latent"),
                          K = 5, length = 5, rho_w = 0.5,
                          w = rep.int(1/length, length),
@@ -233,8 +433,91 @@ simple_scale <- function(prob = c("centered", "skewed", "polarized", "latent"),
 }
 
 
-# obtain relevant quantities for a simplified model distribution
-# (as used in the paper)
+#' Stylized model distribution
+#'
+#' Generate relevant quantities of a stylized model distribution for ordinal
+#' measurement scales in which items have equal marginal response
+#' distributions, equal within-scale correlations, and equal between-scale
+#' correlations.  Analogous quantities are generated for specified linear
+#' combinations of items.
+#'
+#' @param X  list of relevant quantities for an ordinal measurement scale and
+#' a certain linear combination of items, as returned by [simple_scale()].
+#' @param Y  list of relevant quantities for an ordinal measurement scale and
+#' a certain linear combination of items, as returned by [simple_scale()].
+#' @param rho  correlation between the linear combinations of the ordinal
+#' measurement scales.
+#' @param \dots  additional arguments by default to be passed to
+#' [simple_scale()].
+#'
+#' @return A list with the following components:
+#' \item{X, Y}{each is a list with the following components detailing the
+#' distribution of the ordinal measurement scale:
+#' \itemize{
+#'   \item{`cat`: vector of response categories, encoded as `-M`, `-M+1`,
+#'   \dots, `M-1`, `M`.}
+#'   \item{`prob`: vector of response probabilites, shared by all items.}
+#'   \item{`K`: number of response categories.}
+#'   \item{`M`: upper bound of the support region of the items, with the
+#'   lower bound given by `-M`.}
+#'   \item{`keys`: vector indicating whether items are positively keyed (`1`)
+#'   or negatively keyed (`-1`). Its elements are simply derived as the signs
+#'   of the weight vector of the linear combination.}
+#'   \item{`mean`: vector of means of the items.}
+#'   \item{`cov`: covariance matrix of the items.}
+#' }
+#' }
+#' \item{cov_XY}{cross-covariance matrix of the measurement scales.}
+#' \item{a}{weight vector for the linear combination `U` of items in the
+#' ordinal measurement scale from `X`.}
+#' \item{b}{weight vector for the linear combination `V` of items in the
+#' ordinal measurement scale from `Y`.}
+#' \item{U, V}{each is a list with the following components detailing the
+#' distribution of the linear combination of the ordinal measurement scale:
+#' \itemize{
+#'   \item{`M`: upper bound of the support region of the linear combination,
+#'   with the lower bound given by `-M`.}
+#'   \item{`mean`: mean of the linear combination.}
+#'   \item{`var`: variance of the linear combination.}
+#' }
+#' }
+#' \item{cov_UV}{covariance between the linear combinations of the ordinal
+#' measurement scales.}
+#' \item{rho}{correlation between the linear combinations of the ordinal
+#' measurement scales.}
+#'
+#' @author Andreas Alfons
+#'
+#' @references
+#' M. Welz, A. Archimbaud, A. Alfons (2026). Quantifying the impact of careless
+#' responding. PsyArXiv. \doi{10.31234/osf.io/8fj6p_v2}.
+#'
+#' @seealso
+#' [careless()], [reversed()], [adversarial()]
+#'
+#' [bias()], [max_bias()], [breakdown()]
+#'
+#' @examples
+#' # centered distributions
+#' model_XY <- simple_model(prob = "centered", K = 9,
+#'                          length = 5, rho_w = 0.4,
+#'                          rho = -0.4)
+#'
+#' # this is actually equivalent to:
+#' model_latent <- simple_model(prob = "latent", mean = 0, sd = 0.9,
+#'                              skew = 0, K = 9, length = 5,
+#'                              rho_w = 0.4, rho = -0.4)
+#' all.equal(model_XY, model_latent)
+#'
+#' # contamination fractions
+#' eps <- c(0, 0.1, 0.2, 0.3, 0.4, 0.49)
+#'
+#' # bias under straightlining at extreme response categories
+#' bias(model_XY, epsilon = eps, contamination = "careless",
+#'      type = "straightlining", target = "extreme")
+#'
+#' @export
+
 simple_model <- function(X = simple_scale(...), Y = X, rho = 0, ...) {
 
   # initializations
@@ -295,10 +578,53 @@ simple_model <- function(X = simple_scale(...), Y = X, rho = 0, ...) {
 }
 
 
-# wrapper function for a simplified model where Y is an identical copy of X
-# (to be used for breakdown value calculations)
+#' Stylized model distribution of identical copies
+#'
+#' Generate relevant quantities of a stylized model distribution for two
+#' identical copies of an ordinal measurement scale and a specified linear
+#' combination of items. In this stylized model distribution, items of the
+#' measurement scale have equal marginal response distributions and equal
+#' within-scale correlations.
+#'
+#' @inheritParams simple_model
+#'
+#' @inherit simple_model return
+#'
+#' @note This is intended for maximum bias and breakdown value calculations
+#' relating to a stricter definition of the latter that is commonly found in
+#' the statistical literature. It defines the breakdown value as the smallest
+#' contamination fraction so that the correlation functional at the
+#' contaminated distribution is negative for two random variables with
+#' correlation 1 at the model distribution.
+#'
+#' @author Andreas Alfons
+#'
+#' @references
+#' M. Welz, A. Archimbaud, A. Alfons (2026). Quantifying the impact of careless
+#' responding. PsyArXiv. \doi{10.31234/osf.io/8fj6p_v2}.
+#'
+#' @seealso [max_bias()], [breakdown()]
+#'
+#' @examples
+#' model_XX <- identical_model(prob = "centered", K = 9,
+#'                             length = 5, rho_w = 0.4)
+#'
+#' # compute breakdown value
+#' breakdown(model_XX)
+#'
+#' # verification with maximum bias
+#' max_bias(model_XX, epsilon = breakdown(model_XX))
+#'
+#' @export
+
 identical_model <- function(X = simple_scale(...), ...) {
-  simple_model(X = X, Y = X, rho = 1)
+  # let simple_model() do most of the work
+  model_XX <- simple_model(X = X, Y = X, rho = 1)
+  # but here the between-scale covariance matrix is identical to the
+  # within-scale covariance matrix
+  model_XX$cov_XY <- model_XX$X$cov
+  # return list of relevant quantities of model distribution
+  model_XX
 }
 
 
@@ -306,8 +632,71 @@ identical_model <- function(X = simple_scale(...), ...) {
 get_length <- function(scale) length(scale$mean)
 
 
-# obtain relevant quantities for contamination distributions corresponding
-# to certain careless responding behavior
+#' Contamination distribution corresponding to careless responding
+#'
+#' Generate relevant quantities of a contamination distribution corresponding
+#' to (stylized) careless responding behavior.
+#'
+#' @param model  list of relevant quantities detailing the distribution of
+#' ordinal measurement scales, as generated by [get_model()] or
+#' [simple_model()].
+#' @param type  type of careless responding behavior. Possible value are:
+#' - `"straightlining"`: randomly select a response category from certain
+#'   target categories, then use the selected response for all items.
+#' - `"random"`: randomly select a response category from certain target
+#'   categories independently for all items.
+#' @param target  target response categories for the above types of careless
+#' responding behavior. Possible values are:
+#' - `"extreme"`: select only from the extreme two response categories.
+#' - `"all"`: select from all response categories.
+#'
+#' @return A list with the following components:
+#' \item{X, Y}{each is a list with the following components detailing the
+#' distribution of the careless responding behavior:
+#' \itemize{
+#'   \item{`prob`: vector of response probabilites, shared by all items.}
+#'   \item{`mean`: vector of means of the items.}
+#'   \item{`cov`: covariance matrix of the items.}
+#' }
+#' }
+#' \item{cov_XY}{cross-covariance matrix of the distribution of the careless
+#' responding behavior.}
+#'
+#' @author Andreas Alfons
+#'
+#' @references
+#' M. Welz, A. Archimbaud, A. Alfons (2026). Quantifying the impact of careless
+#' responding. PsyArXiv. \doi{10.31234/osf.io/8fj6p_v2}.
+#'
+#' @seealso
+#' [get_model()], [simple_model()]
+#'
+#' [bias()]
+#'
+#' @examples
+#' # generate model distribution
+#' model_XY <- simple_model(prob = "centered", K = 9,
+#'                          length = 5, rho_w = 0.4,
+#'                          rho = -0.4)
+#'
+#' # straightlining from extreme response categories
+#' straight_extreme <- careless(model_XY, type = "straightlining",
+#'                              target = "extreme")
+#'
+#' # straightlining from all response categories
+#' straight_all <- careless(model_XY, type = "straightlining",
+#'                          target = "all")
+#'
+#' # random responding from extreme response categories
+#' random_extreme <- careless(model_XY, type = "random",
+#'                            target = "extreme")
+#'
+#' # random responding from all response categories
+#' random_all <- careless(model_XY, type = "random",
+#'                        target = "all")
+#'
+#' @export
+
 careless <- function(model, type = c("straightlining", "random"),
                      target = c("extreme", "all")) {
 
@@ -374,8 +763,57 @@ careless <- function(model, type = c("straightlining", "random"),
 }
 
 
-# obtain relevant quantities for adversarial contamination resulting in
-# maximum upward or downward bias
+#' Adversarial contamination distribution
+#'
+#' Generate relevant quantities of an adversarial contamination distribution
+#' resulting in maximum upward or downward bias of Pearson's correlation
+#' coefficient.  That is, responses for all items are selected in the most
+#' harmful manner for this correlation estimator.
+#'
+#' @param model  list of relevant quantities detailing the distribution of
+#' ordinal measurement scales, as generated by [get_model()],
+#' [simple_model()], or [identical_model()].
+#' @param direction  direction of the resulting maximum bias. Possible values
+#' are:
+#' - `"upward"`: adversarial contamination resulting in maximum upward bias.
+#' - `"downward"`: adversarial contamination resulting in maximum downward bias.
+#'
+#' @return A list with the following components:
+#' \item{X, Y}{each is a list with the following components detailing the
+#' adversarial contamination distribution:
+#' \itemize{
+#'   \item{`mean`: vector of means of the items.}
+#'   \item{`cov`: covariance matrix of the items.}
+#' }
+#' }
+#' \item{cov_XY}{cross-covariance matrix of the distribution of the adversarial
+#' contamination distribution.}
+#'
+#' @author Andreas Alfons
+#'
+#' @references
+#' M. Welz, A. Archimbaud, A. Alfons (2026). Quantifying the impact of careless
+#' responding. PsyArXiv. \doi{10.31234/osf.io/8fj6p_v2}.
+#'
+#' @seealso
+#' [get_model()], [simple_model()], [identical_model()]
+#'
+#' [bias()], [max_bias()], [breakdown()]
+#'
+#' @examples
+#' # generate model distribution
+#' model_XY <- simple_model(prob = "centered", K = 9,
+#'                          length = 5, rho_w = 0.4,
+#'                          rho = -0.4)
+#'
+#' # adversarial contamination resulting in maximum upward bias
+#' adv_upward <- adversarial(model_XY, direction = "upward")
+#'
+#' # adversarial contamination resulting in maximum downward bias
+#' adv_downward <- adversarial(model_XY, direction = "downward")
+#'
+#' @export
+
 adversarial <- function(model, direction = c("upward", "downward")) {
 
   # initializations
@@ -384,8 +822,10 @@ adversarial <- function(model, direction = c("upward", "downward")) {
   # extract components from object for model distribution
   M_X <- model$X$M
   p <- get_length(model$X)
+  a <- model$a
   M_Y <- model$Y$M
   q <- get_length(model$Y)
+  b <- model$b
 
   # extract signs of coefficient vectors
   sign_a <- sign(a)
@@ -412,7 +852,54 @@ adversarial <- function(model, direction = c("upward", "downward")) {
 }
 
 
-# obtain contamination distribution by reversing scale in model distribution
+#' Contamination distribution corresponding to scale reversal
+#'
+#' Generate relevant quantities of a contamination distribution corresponding
+#' to respondents reversing one or both scales in a model distribution.
+#'
+#' @param model  list of relevant quantities detailing the distribution of
+#' ordinal measurement scales, as generated by [get_model()] or
+#' [simple_model()].
+#' @param which  which scale to reverse for the contamination distribution.
+#' Possible values are `"X"`, `"Y"` and `"both"`.
+#'
+#' @return A list with the following components:
+#' \item{X, Y}{each is a list with the following components detailing the
+#' contamination distribution:
+#' \itemize{
+#'   \item{`mean`: vector of means of the items.}
+#'   \item{`cov`: covariance matrix of the items.}
+#' }
+#' }
+#' \item{cov_XY}{cross-covariance matrix of the distribution of the
+#' contamination distribution.}
+#'
+#' @author Andreas Alfons
+#'
+#' @references
+#' M. Welz, A. Archimbaud, A. Alfons (2026). Quantifying the impact of careless
+#' responding. PsyArXiv. \doi{10.31234/osf.io/8fj6p_v2}.
+#'
+#' @seealso
+#' [get_model()], [simple_model()]
+#'
+#' [bias()]
+#'
+#' @examples
+#' # generate model distribution
+#' model_XY <- simple_model(prob = "skewed", K = 9,
+#'                          length = 5, rho_w = 0.4,
+#'                          rho = 0.4)
+#'
+#' # contamination with one reversed scale
+#' rev_X <- reversed(model_XY, which = "X")
+#' rev_Y <- reversed(model_XY, which = "Y")
+#'
+#' # contamination with both scales reversed
+#' rev_both <- reversed(model_XY, which = "both")
+#'
+#' @export
+
 reversed <- function(model, which = c("X", "Y", "both")) {
 
   # initializations
@@ -433,3 +920,78 @@ reversed <- function(model, which = c("X", "Y", "both")) {
   )
 
 }
+
+#' Cronbach alpha under our assumptions
+#'
+#' @param J construct size
+#' @param rho Within-construct correlation between items in a construct comprising items that are each identically distributed
+#'
+#' @return Cronbach alpha (numeric scalar)
+#' @author Max Welz
+#' @export
+cronbach <- function(J, rho)
+{
+  ## input checks
+  .input_check_constructsize(J)
+  .input_check_rho(rho)
+
+  ## call main function
+  .cronbach(J = J, rho = rho)
+}
+
+
+#' Internal function to calculate cronbach alpha
+#'
+#'
+#' @author Max Welz
+#' @noRd
+.cronbach <- function(J, rho)
+{
+  J / (J-1) * (1 - 1 / (1 + (J-1) * rho))
+}
+
+#' Void internal function to check a supplied construct size
+#'
+#' @param x Number of items in a given construct
+#'
+#' @author Max Welz
+#' @noRd
+.input_check_constructsize <- function(x)
+{
+  if(!is.numeric(x) || length(x) > 1L)
+  {
+    stop("Construct sizes must be a numeric vector of length 1")
+  } # IF
+
+  if(!identical(0, x %% 1))
+  {
+    stop("Construct size must be integer-valued")
+  } # IF
+
+  if(x <= 0L)
+  {
+    stop("Construct size must be at least 1")
+  } # IF
+} # FUN
+
+
+#' Void internal function to check a supplied correlation coefficient
+#'
+#' A correlation coefficient must be a numeric scalar in [-1, 1]
+#'
+#' @param x Correlation coefficient
+#' @author Max Welz
+#' @noRd
+.input_check_rho <- function(x)
+{
+  if(!is.numeric(x) || !is.vector(x) || length(x) > 1L)
+  {
+    stop("Correlation coefficients must be a numeric vector of length 1")
+  } # IF
+
+  if(!(-1.0 <= x && x <= 1.0))
+  {
+    stop("Correlation coefficients must take values in [-1, 1]")
+  } # IF
+}
+

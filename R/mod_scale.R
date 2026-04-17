@@ -9,6 +9,7 @@
 #' @importFrom shiny NS tagList
 #' @import DT
 #' @import bsicons
+#' @import plotly
 #' @rawNamespace import(shiny, except=c(dataTableOutput, renderDataTable))
 mod_scale_ui <- function(id) {
   ns <- NS(id)
