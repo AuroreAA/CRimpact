@@ -8,47 +8,47 @@ simple_model(X = simple_scale(...), Y = X, rho = 0, ...)
 }
 \arguments{
 \item{X}{list of relevant quantities for an ordinal measurement scale and
-a certain linear combination of items, as returned by [simple_scale()].}
+a certain linear combination of items, as returned by \code{\link[=simple_scale]{simple_scale()}}.}
 
 \item{Y}{list of relevant quantities for an ordinal measurement scale and
-a certain linear combination of items, as returned by [simple_scale()].}
+a certain linear combination of items, as returned by \code{\link[=simple_scale]{simple_scale()}}.}
 
 \item{rho}{correlation between the linear combinations of the ordinal
 measurement scales.}
 
 \item{\dots}{additional arguments by default to be passed to
-[simple_scale()].}
+\code{\link[=simple_scale]{simple_scale()}}.}
 }
 \value{
 A list with the following components:
 \item{X, Y}{each is a list with the following components detailing the
 distribution of the ordinal measurement scale:
 \itemize{
-  \item{`cat`: vector of response categories, encoded as `-M`, `-M+1`,
-  \dots, `M-1`, `M`.}
-  \item{`prob`: vector of response probabilites, shared by all items.}
-  \item{`K`: number of response categories.}
-  \item{`M`: upper bound of the support region of the items, with the
-  lower bound given by `-M`.}
-  \item{`keys`: vector indicating whether items are positively keyed (`1`)
-  or negatively keyed (`-1`). Its elements are simply derived as the signs
-  of the weight vector of the linear combination.}
-  \item{`mean`: vector of means of the items.}
-  \item{`cov`: covariance matrix of the items.}
+\item{\code{cat}: vector of response categories, encoded as \code{-M}, \code{-M+1},
+\dots, \code{M-1}, \code{M}.}
+\item{\code{prob}: vector of response probabilites, shared by all items.}
+\item{\code{K}: number of response categories.}
+\item{\code{M}: upper bound of the support region of the items, with the
+lower bound given by \code{-M}.}
+\item{\code{keys}: vector indicating whether items are positively keyed (\code{1})
+or negatively keyed (\code{-1}). Its elements are simply derived as the signs
+of the weight vector of the linear combination.}
+\item{\code{mean}: vector of means of the items.}
+\item{\code{cov}: covariance matrix of the items.}
 }
 }
 \item{cov_XY}{cross-covariance matrix of the measurement scales.}
-\item{a}{weight vector for the linear combination `U` of items in the
-ordinal measurement scale from `X`.}
-\item{b}{weight vector for the linear combination `V` of items in the
-ordinal measurement scale from `Y`.}
+\item{a}{weight vector for the linear combination \code{U} of items in the
+ordinal measurement scale from \code{X}.}
+\item{b}{weight vector for the linear combination \code{V} of items in the
+ordinal measurement scale from \code{Y}.}
 \item{U, V}{each is a list with the following components detailing the
 distribution of the linear combination of the ordinal measurement scale:
 \itemize{
-  \item{`M`: upper bound of the support region of the linear combination,
-  with the lower bound given by `-M`.}
-  \item{`mean`: mean of the linear combination.}
-  \item{`var`: variance of the linear combination.}
+\item{\code{M}: upper bound of the support region of the linear combination,
+with the lower bound given by \code{-M}.}
+\item{\code{mean}: mean of the linear combination.}
+\item{\code{var}: variance of the linear combination.}
 }
 }
 \item{cov_UV}{covariance between the linear combinations of the ordinal
@@ -88,9 +88,9 @@ M. Welz, A. Archimbaud, A. Alfons (2026). Quantifying the impact of careless
 responding. PsyArXiv. \doi{10.31234/osf.io/8fj6p_v2}.
 }
 \seealso{
-[careless()], [reversed()], [adversarial()]
+\code{\link[=careless]{careless()}}, \code{\link[=reversed]{reversed()}}, \code{\link[=adversarial]{adversarial()}}
 
-[bias()], [max_bias()], [breakdown()]
+\code{\link[=bias]{bias()}}, \code{\link[=max_bias]{max_bias()}}, \code{\link[=breakdown]{breakdown()}}
 }
 \author{
 Andreas Alfons

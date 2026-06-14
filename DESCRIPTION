@@ -1,15 +1,15 @@
 Package: CRimpact
-Title: Careless Responding Impact
-Version: 0.0.1.0000
+Title: Tools for Quantifying the Impact of Careless Responding
+Version: 0.1.0
 Authors@R: c(
-    person("Aurore", "Archimbaud", , "aurore.archimbaud@live.fr", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0002-6511-9091")),
-    person("Andreas", "Alfons", , "alfons@ese.eur.nl", role = "aut",
-           comment = c(ORCID = "0000-0002-2513-3788")),
-    person("Max", "Welz", , "max.welz@uzh.ch", role = "aut",
-           comment = c(ORCID = "0000-0003-2945-1860"))
+    person("Aurore", "Archimbaud", email = "aurore.archimbaud@live.fr", 
+           role = c("aut", "cre"), comment = c(ORCID = "0000-0002-6511-9091")),
+    person("Andreas", "Alfons", email = "alfons@ese.eur.nl", 
+           role = "aut", comment = c(ORCID = "0000-0002-2513-3788")),
+    person("Max", "Welz", email = "max.welz@uzh.ch", 
+           role = "aut", comment = c(ORCID = "0000-0003-2945-1860"))
   )
-Description: PKG_DESC.
+Description: Set of functions and web application for quantifying the impact of careless responding, currently focused on the Pearson correlation coefficient.
 License: GPL (>= 3)
 Imports: 
     bsicons,
@@ -34,7 +34,8 @@ Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-US
 LazyData: true
-RoxygenNote: 7.3.2
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
 VignetteBuilder: knitr
 URL: https://github.com/AuroreAA/CRimpact
 BugReports: https://github.com/AuroreAA/CRimpact/issues

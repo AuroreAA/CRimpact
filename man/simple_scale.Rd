@@ -15,9 +15,9 @@ simple_scale(
 }
 \arguments{
 \item{prob}{type of marginal response distribution. The choices
-`"centered"`, `"skewed"`, and `"polarized"` allow to quickly generate
+\code{"centered"}, \code{"skewed"}, and \code{"polarized"} allow to quickly generate
 marginal response probabilities with the corresponding property. If
-`"latent"`, the marginal response probabilities are generated based on a
+\code{"latent"}, the marginal response probabilities are generated based on a
 latent skew-normal distribution via function
 \code{\link[latent2likert]{simulate_likert}()}.}
 
@@ -30,29 +30,31 @@ latent skew-normal distribution via function
 \item{w}{weight vector for computing a linear combination of items in the
 ordinal measurement scale.}
 
-\item{\dots}{if `prob = "latent"`, the centered parameters of the latent
+\item{\dots}{if \code{prob = "latent"}, the centered parameters of the latent
 skew-normal distribution can be specified through the following additional
 arguments:
-- `mean`: mean (defaults to 0).
-- `sd`: standard deviation (defaults to 1)
-- `skew`: skweness (defaults to 0, must be between -0.95 and 0.95)}
+\itemize{
+\item \code{mean}: mean (defaults to 0).
+\item \code{sd}: standard deviation (defaults to 1)
+\item \code{skew}: skweness (defaults to 0, must be between -0.95 and 0.95)
+}}
 }
 \value{
 A list with the following components:
 \item{scale}{a list with the following components detailing the
 distribution of the ordinal measurement scale:
 \itemize{
-  \item{`cat`: vector of response categories, encoded as `-M`, `-M+1`,
-  \dots, `M-1`, `M`.}
-  \item{`prob`: vector of response probabilites, shared by all items.}
-  \item{`K`: number of response categories.}
-  \item{`M`: upper bound of the support region of the items, with the
-  lower bound given by `-M`.}
-  \item{`keys`: vector indicating whether items are positively keyed (`1`)
-  or negatively keyed (`-1`). Its elements are simply derived as the signs
-  of the weight vector of the linear combination.}
-  \item{`mean`: vector of means of the items.}
-  \item{`cov`: covariance matrix of the items.}
+\item{\code{cat}: vector of response categories, encoded as \code{-M}, \code{-M+1},
+\dots, \code{M-1}, \code{M}.}
+\item{\code{prob}: vector of response probabilites, shared by all items.}
+\item{\code{K}: number of response categories.}
+\item{\code{M}: upper bound of the support region of the items, with the
+lower bound given by \code{-M}.}
+\item{\code{keys}: vector indicating whether items are positively keyed (\code{1})
+or negatively keyed (\code{-1}). Its elements are simply derived as the signs
+of the weight vector of the linear combination.}
+\item{\code{mean}: vector of means of the items.}
+\item{\code{cov}: covariance matrix of the items.}
 }
 }
 \item{w}{weight vector for the linear combination of items in the
@@ -60,10 +62,10 @@ ordinal measurement scale.}
 \item{score}{a list with the following components detailing the distribution
 of the linear combination of the ordinal measurement scale:
 \itemize{
-  \item{`M`: upper bound of the support region of the linear combination,
-  with the lower bound given by `-M`.}
-  \item{`mean`: mean of the linear combination.}
-  \item{`var`: variance of the linear combination.}
+\item{\code{M}: upper bound of the support region of the linear combination,
+with the lower bound given by \code{-M}.}
+\item{\code{mean}: mean of the linear combination.}
+\item{\code{var}: variance of the linear combination.}
 }
 }
 }
@@ -104,7 +106,7 @@ M. Welz, A. Archimbaud, A. Alfons (2026). Quantifying the impact of careless
 responding. PsyArXiv. \doi{10.31234/osf.io/8fj6p_v2}.
 }
 \seealso{
-[simple_model()]
+\code{\link[=simple_model]{simple_model()}}
 }
 \author{
 Andreas Alfons

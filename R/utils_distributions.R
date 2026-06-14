@@ -4,10 +4,60 @@
 # ************************************
 
 
-#' utility function for marginal distribution
-#' @importFrom latent2likert simulate_likert
+#' Marginal response distribution
+#'
+#' Generate the probabilities of a marginal response distribution.
+#'
+#' @param distribution  type of marginal response distribution. The choices
+#' `"uniform"` (the default), `"centered"`, `"skewed"`, and `"polarized"` allow
+#' to quickly generate marginal response probabilities with the corresponding
+#' property. If `"latent"`, the marginal response probabilities are generated
+#' based on a latent skew-normal distribution via function
+#' \code{\link[latent2likert]{simulate_likert}()}.
+#' @param K  number of response categories.
+#' @param target  if `distribution = "uniform"`, the target response categories
+#' from which to choose uniformly. Possible values are `"all"` (the default) to
+#' choose from all response categories, and `"extreme"` to choose only from the
+#' extreme response categories.
+#' @param mean  if `distribution = "latent"`, the mean of the latent
+#' skew-normal distribution (defaults to 0).
+#' @param sd  if `distribution = "latent"`, the standard deviation of the
+#' latent skew-normal distribution (defaults to 1).
+#' @param skew  if `distribution = "latent"`, the skweness of the latent
+#' skew-normal distribution (defaults to 0, must be between -0.95 and 0.95).
+#'
+#' @return A vector of probabilities for the specified marginal response
+#' distribution.
+#'
 #' @author Andreas Alfons
-#' @noRd
+#'
+#' @references
+#' M. Welz, A. Archimbaud, A. Alfons (2026). Quantifying the impact of careless
+#' responding. PsyArXiv. \doi{10.31234/osf.io/8fj6p_v2}.
+#'
+#' @seealso [simple_scale()], [careless()]
+#'
+#' @examples
+#' # uniform distribution
+#' get_marginal("uniform", K = 5, target = "all")
+#' get_marginal("uniform", K = 5, target = "extreme")
+#'
+#' # centered distribution
+#' get_marginal("centered", K = 9)
+#' # this is actually equivalent to:
+#' get_marginal("latent", K = 9, mean = 0, sd = 0.9, skew = 0)
+#'
+#' # skewed distribution
+#' get_marginal("skewed", K = 9,)
+#' # this is actually equivalent to:
+#' get_marginal("latent", K = 9, mean = 0, sd = 1.1, skew = -0.95)
+#'
+#' # polarized distribution
+#' get_marginal("polarized", K = 9)
+#'
+#' @importFrom latent2likert simulate_likert
+#' @export
+
 get_marginal <- function(distribution = c("uniform", "centered", "skewed",
                                           "polarized", "latent"),
                          K = 5L, target = c("all", "extreme"),
@@ -977,7 +1027,7 @@ cronbach <- function(J, rho)
 
 #' Void internal function to check a supplied correlation coefficient
 #'
-#' A correlation coefficient must be a numeric scalar in [-1, 1]
+#' A correlation coefficient must be a numeric scalar in \eqn{[-1, 1]}.
 #'
 #' @param x Correlation coefficient
 #' @author Max Welz

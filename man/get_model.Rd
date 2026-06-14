@@ -15,54 +15,54 @@ get_model(
 }
 \arguments{
 \item{X}{matrix of observations on an ordinal measurement scale consisting
-of `p` items.}
+of \code{p} items.}
 
 \item{Y}{matrix of observations on an ordinal measurement scale consisting
-of `q` items.}
+of \code{q} items.}
 
 \item{cat_X}{vector of response categories in the ordinal measurement scale
-from `X`.  If `NULL` (the default), the unique observed values in `X` are
+from \code{X}.  If \code{NULL} (the default), the unique observed values in \code{X} are
 used.}
 
 \item{cat_Y}{vector of response categories in the ordinal measurement scale
-from `Y`.  If `NULL` (the default), the unique observed values in `Y` are
+from \code{Y}.  If \code{NULL} (the default), the unique observed values in \code{Y} are
 used.}
 
 \item{a}{weight vector for computing a linear combination of items in the
-ordinal measurement scale from `X`.}
+ordinal measurement scale from \code{X}.}
 
 \item{b}{weight vector for computing a linear combination of items in the
-ordinal measurement scale from `Y`.}
+ordinal measurement scale from \code{Y}.}
 }
 \value{
 A list with the following components:
 \item{X, Y}{each is a list with the following components detailing the
 distribution of the ordinal measurement scale:
 \itemize{
-  \item{`cat`: vector of response categories, encoded as `-M`, `-M+1`,
-  \dots, `M-1`, `M`.}
-  \item{`K`: number of response categories.}
-  \item{`M`: upper bound of the support region of the items, with the
-  lower bound given by `-M`.}
-  \item{`keys`: vector indicating whether items are positively keyed (`1`)
-  or negatively keyed (`-1`). Its elements are simply derived as the signs
-  of the weight vector of the linear combination.}
-  \item{`mean`: vector of means of the items.}
-  \item{`cov`: covariance matrix of the items.}
+\item{\code{cat}: vector of response categories, encoded as \code{-M}, \code{-M+1},
+\dots, \code{M-1}, \code{M}.}
+\item{\code{K}: number of response categories.}
+\item{\code{M}: upper bound of the support region of the items, with the
+lower bound given by \code{-M}.}
+\item{\code{keys}: vector indicating whether items are positively keyed (\code{1})
+or negatively keyed (\code{-1}). Its elements are simply derived as the signs
+of the weight vector of the linear combination.}
+\item{\code{mean}: vector of means of the items.}
+\item{\code{cov}: covariance matrix of the items.}
 }
 }
 \item{cov_XY}{cross-covariance matrix of the measurement scales.}
-\item{a}{weight vector for the linear combination `U` of items in the
-ordinal measurement scale from `X`.}
-\item{b}{weight vector for the linear combination `V` of items in the
-ordinal measurement scale from `Y`.}
+\item{a}{weight vector for the linear combination \code{U} of items in the
+ordinal measurement scale from \code{X}.}
+\item{b}{weight vector for the linear combination \code{V} of items in the
+ordinal measurement scale from \code{Y}.}
 \item{U, V}{each is a list with the following components detailing the
 distribution of the linear combination of the ordinal measurement scale:
 \itemize{
-  \item{`M`: upper bound of the support region of the linear combination,
-  with the lower bound given by `-M`.}
-  \item{`mean`: mean of the linear combination.}
-  \item{`var`: variance of the linear combination.}
+\item{\code{M}: upper bound of the support region of the linear combination,
+with the lower bound given by \code{-M}.}
+\item{\code{mean}: mean of the linear combination.}
+\item{\code{var}: variance of the linear combination.}
 }
 }
 \item{cov_UV}{covariance between the linear combinations of the ordinal
@@ -136,9 +136,9 @@ M. Welz, A. Archimbaud, A. Alfons (2026). Quantifying the impact of careless
 responding. PsyArXiv. \doi{10.31234/osf.io/8fj6p_v2}.
 }
 \seealso{
-[careless()], [reversed()], [adversarial()]
+\code{\link[=careless]{careless()}}, \code{\link[=reversed]{reversed()}}, \code{\link[=adversarial]{adversarial()}}
 
-[bias()], [max_bias()], [breakdown()]
+\code{\link[=bias]{bias()}}, \code{\link[=max_bias]{max_bias()}}, \code{\link[=breakdown]{breakdown()}}
 }
 \author{
 Andreas Alfons
