@@ -57,7 +57,7 @@ mod_sidebar_scale_ui <- function(id) {
 
       ),
 
-      numericInput(ns("rhoscale"), "Within-scale correlation", 0.8, min = 0, max = 1, step = 0.1),
+      numericInput(ns("rhoscale"), "Within-scale correlation", 0.4, min = 0, max = 1, step = 0.1),
       div(id = ns("sameX"),
           div(
             class = "d-flex justify-content-center",
