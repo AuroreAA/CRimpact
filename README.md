@@ -32,4 +32,4 @@ Andreas Alfons, Aurore Archimbaud and Max Welz
 
 ## Contact
 
-Please feel free to open an issue on the GitHub repository, if you encounter any issues or have questions.
+Please feel free to open an issue if you encounter any issues.
