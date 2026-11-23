@@ -2,6 +2,7 @@
 
 export(adversarial)
 export(bias)
+export(bias_bound)
 export(breakdown)
 export(careless)
 export(cronbach)

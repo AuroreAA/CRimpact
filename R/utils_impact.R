@@ -482,3 +482,110 @@ max_bias_plot <- function(maxbias, digits = 2,
   }
   return(gg)
 }
+
+
+
+## bound for maximum upward or downward bias
+#' @export
+
+bias_bound <- function(model, epsilon, direction = NULL) {
+
+  # initializations
+  rho <- model$rho
+  if (is.null(direction)) {
+    # by default, take the larger of upward or downward bias
+    direction <- if (rho < 0) "upward" else "downward"
+  } else direction <- match.arg(direction, choices = c("upward", "downward"))
+
+  # select function to be optimized according to direction of bias
+  if (direction == "upward") {
+    rho_contaminated <- rho_contaminated_upward
+    control_list <- list(fnscale = -1)  # maximize
+  } else {
+    rho_contaminated <- rho_contaminated_downward
+    control_list <- list()  # minimize
+  }
+
+  # numerical optimization given a weighted mixture of two point-mass
+  # distributions in respective corner points
+  opt_list <- lapply(epsilon, function(eps) {
+    if (eps == 0) list(par = NA_real_, value = rho)
+    else {
+      optim(0.5, rho_contaminated, model = model, epsilon = eps,
+            method = "L-BFGS-B", lower = 0, upper = 1,
+            control = control_list)
+    }
+  })
+
+  # extract values of optimal weight and corresponding contaminated correlation
+  w <- sapply(opt_list, "[[", "par")
+  rho_G <- sapply(opt_list, "[[", "value")
+
+  # return results
+  list(epsilon = epsilon, rho = model$rho, rho_contaminated = rho_G,
+       bias = rho_G - model$rho, direction = direction, w = w)
+
+}
+
+
+## utility functions for numerical optimization
+## Note: The optimization needs to be done for each contamination fraction,
+##       hence 'epsilon' needs to be a scalar here.
+
+# correlation pushed upward under contaminated distribution
+rho_contaminated_upward <- function(w, model, epsilon) {
+
+  # extract relevant quantities at model distribution F
+  E_F_U <- model$U$mean
+  E_F_V <- model$V$mean
+  var_F_U <- model$U$var
+  var_F_V <- model$V$var
+  cov_F_UV <- model$cov_UV
+
+  # bounds of support
+  M_U <- model$U$M
+  M_V <- model$V$M
+
+  # compute covariance and variance under contaminated distribution G
+  # TODO: If necessary, we can define some constants to avoid unnecessary
+  #       recomputation. But for now, I prioritized readability of the code.
+  var_G_U <- (1 - epsilon) * var_F_U + 4 * epsilon * w * (1 - w) * M_U^2 +
+    epsilon * (1 - epsilon) * (E_F_U + (1 - 2 * w) * M_U)^2
+  var_G_V <- (1 - epsilon) * var_F_V + 4 * epsilon * w * (1 - w) * M_V^2 +
+    epsilon * (1 - epsilon) * (E_F_V + (1 - 2 * w) * M_V)^2
+  cov_G_UV <- (1-epsilon) * cov_F_UV + 4 * epsilon * w * (1-w) * M_U * M_V +
+    epsilon * (1-epsilon) * (E_F_U + (1-2*w) * M_U) * (E_F_V + (1-2*w) * M_V)
+
+  # return correlation under contaminated distribution G
+  cov_G_UV / sqrt(var_G_U * var_G_V)
+
+}
+
+# correlation pushed downward under contaminated distribution
+rho_contaminated_downward <- function(w, model, epsilon) {
+
+  # extract relevant quantities at model distribution F
+  E_F_U <- model$U$mean
+  E_F_V <- model$V$mean
+  var_F_U <- model$U$var
+  var_F_V <- model$V$var
+  cov_F_UV <- model$cov_UV
+
+  # bounds of support
+  M_U <- model$U$M
+  M_V <- model$V$M
+
+  # compute covariance and variance under contaminated distribution G
+  # TODO: If necessary, we can define some constants to avoid unnecessary
+  #       recomputation. But for now, I prioritized readability of the code.
+  var_G_U <- (1 - epsilon) * var_F_U + 4 * epsilon * w * (1 - w) * M_U^2 +
+    epsilon * (1 - epsilon) * (E_F_U + (1 - 2 * w) * M_U)^2
+  var_G_V <- (1 - epsilon) * var_F_V + 4 * epsilon * w * (1 - w) * M_V^2 +
+    epsilon * (1 - epsilon) * (E_F_V - (1 - 2 * w) * M_V)^2
+  cov_G_UV <- (1-epsilon) * cov_F_UV - 4 * epsilon * w * (1-w) * M_U * M_V +
+    epsilon * (1-epsilon) * (E_F_U + (1-2*w) * M_U) * (E_F_V - (1-2*w) * M_V)
+
+  # return correlation under contaminated distribution G
+  cov_G_UV / sqrt(var_G_U * var_G_V)
+
+}
