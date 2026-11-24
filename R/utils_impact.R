@@ -485,7 +485,7 @@ max_bias_plot <- function(maxbias, digits = 2,
 
 
 
-## bound for maximum upward or downward bias
+## lower bound (in magnitude) for maximum upward or downward bias
 #' @export
 
 bias_bound <- function(model, epsilon, direction = NULL) {
@@ -587,5 +587,42 @@ rho_contaminated_downward <- function(w, model, epsilon) {
 
   # return correlation under contaminated distribution G
   cov_G_UV / sqrt(var_G_U * var_G_V)
+
+}
+
+
+
+## upper bound for breakdown value
+## (contamination fraction at which sign flip occurs)
+#' @export
+
+breakdown_bound <- function(model) {
+
+  # initializations
+  rho <- model$rho
+  if (rho == 0) return(0)
+
+  # select function to be optimize weight according to direction of bias
+  if (rho > 0) {
+    rho_contaminated <- rho_contaminated_downward
+    control_list <- list()  # minimize
+    rho_H <- -1             # correlation at contamination
+  } else {
+    rho_contaminated <- rho_contaminated_upward
+    control_list <- list(fnscale = -1)  # maximize
+    rho_H <- 1                          # correlation at contamination
+  }
+
+  # find root of correlation under contaminated distribution G
+  out <- uniroot(function(epsilon) {
+    # numerical optimization given a weighted mixture of two point-mass
+    # distributions in respective corner points
+    optim(0.5, rho_contaminated, model = model, epsilon = epsilon,
+          method = "L-BFGS-B", lower = 0, upper = 1,
+          control = control_list)$value
+  }, lower = 0, upper = 1, f.lower = rho, f.upper = rho_H)
+
+  # return breakdown value
+  out$root
 
 }
