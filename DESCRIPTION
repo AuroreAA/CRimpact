@@ -23,6 +23,7 @@ Imports:
     scales,
     shiny,
     shinyWidgets,
+    stats,
     utils
 Suggests: 
     knitr,

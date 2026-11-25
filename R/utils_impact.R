@@ -577,6 +577,7 @@ max_bias_plot <- function(maxbias, digits = 2,
 #' bias_bound(model_XY, epsilon = eps, direction = "upward")
 #' bias_bound(model_XY, epsilon = eps, direction = "downward")
 #'
+#' @importFrom stats optim
 #' @export
 
 bias_bound <- function(model, epsilon, direction = NULL) {
@@ -735,6 +736,7 @@ rho_contaminated_downward <- function(w, model, epsilon) {
 #' # compute upper bound for breakdown value
 #' breakdown_bound(model_XY)
 #'
+#' @importFrom stats optim uniroot
 #' @export
 
 breakdown_bound <- function(model) {
